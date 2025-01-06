@@ -5,15 +5,15 @@ import sys
 import os
 
 # Add parent directory to path to import from sibling directories
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from generate_recommendations import RecommendationGenerator
 
 app = Flask(__name__)
 CORS(app)
 
-# Setup paths relative to project root
-ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-MODEL_PATH = os.path.join(ROOT_DIR, 'data_engineered_v3', 'rs_main_v2_refactored', 'checkpoints', 'best_model.pth')
+# Setup paths relative to new project structure
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_PATH = os.path.join(ROOT_DIR, 'checkpoints', 'best_model.pth')
 DATA_PATH = os.path.join(ROOT_DIR, 'data', 'test_data.csv')
 ENCODERS_PATH = os.path.join(ROOT_DIR, 'data', 'data_encoders.pt')
 
@@ -54,7 +54,7 @@ def get_recommendations():
             'music': data['music']
         }
         
-        recommendations = recommender.generate_recommendations(user_info, n_recommendations=10)
+        recommendations = recommender.generate_recommendations(user_info, n_recommendations=5)
         
         return jsonify({
             'status': 'success',

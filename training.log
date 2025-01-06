@@ -1995,3 +1995,114 @@ Bias Analysis:
 2025-01-04 04:09:39,641 - INFO - Cross-validation results:
 2025-01-04 04:09:39,641 - INFO - val_rmse: 8.2252
 2025-01-04 04:09:39,641 - INFO - val_ndcg: 0.4117
+2025-01-06 13:08:55,145 - INFO - Loading model from /home/travisboltz/Flask App/checkpoints/best_model.pth
+2025-01-06 13:08:58,145 - INFO - Model loaded successfully
+2025-01-06 13:08:58,190 - INFO - Encoder class counts:
+2025-01-06 13:08:58,191 - INFO - user_encoder: 9717
+2025-01-06 13:08:58,192 - INFO - music_encoder: 9373
+2025-01-06 13:08:58,192 - INFO - artist_encoder: 5059
+2025-01-06 13:08:58,193 - INFO - genre_encoder: 12
+2025-01-06 13:08:58,193 - INFO - Model dimensions from state dict:
+2025-01-06 13:08:58,194 - INFO - num_users: 7773
+2025-01-06 13:08:58,194 - INFO - num_music: 9324
+2025-01-06 13:08:58,195 - INFO - num_artists: 4482
+2025-01-06 13:08:58,195 - INFO - num_genres: 12
+2025-01-06 13:08:58,195 - INFO - num_numerical: 12
+2025-01-06 13:08:58,515 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.24.146.253:5000
+2025-01-06 13:08:58,517 - INFO - [33mPress CTRL+C to quit[0m
+2025-01-06 13:08:58,521 - INFO -  * Restarting with stat
+2025-01-06 13:09:08,354 - INFO - Loading model from /home/travisboltz/Flask App/checkpoints/best_model.pth
+2025-01-06 13:09:09,156 - INFO - Model loaded successfully
+2025-01-06 13:09:09,195 - INFO - Encoder class counts:
+2025-01-06 13:09:09,196 - INFO - user_encoder: 9717
+2025-01-06 13:09:09,197 - INFO - music_encoder: 9373
+2025-01-06 13:09:09,197 - INFO - artist_encoder: 5059
+2025-01-06 13:09:09,198 - INFO - genre_encoder: 12
+2025-01-06 13:09:09,198 - INFO - Model dimensions from state dict:
+2025-01-06 13:09:09,199 - INFO - num_users: 7773
+2025-01-06 13:09:09,199 - INFO - num_music: 9324
+2025-01-06 13:09:09,201 - INFO - num_artists: 4482
+2025-01-06 13:09:09,201 - INFO - num_genres: 12
+2025-01-06 13:09:09,202 - INFO - num_numerical: 12
+2025-01-06 13:09:09,330 - WARNING -  * Debugger is active!
+2025-01-06 13:09:09,342 - INFO -  * Debugger PIN: 849-411-670
+2025-01-06 13:09:10,414 - INFO - 172.24.144.1 - - [06/Jan/2025 13:09:10] "GET /api/health HTTP/1.1" 200 -
+2025-01-06 13:10:49,229 - INFO - Loading model from /home/travisboltz/Flask App/checkpoints/best_model.pth
+2025-01-06 13:10:50,465 - INFO - Model loaded successfully
+2025-01-06 13:10:50,509 - INFO - Encoder class counts:
+2025-01-06 13:10:50,510 - INFO - user_encoder: 9717
+2025-01-06 13:10:50,510 - INFO - music_encoder: 9373
+2025-01-06 13:10:50,511 - INFO - artist_encoder: 5059
+2025-01-06 13:10:50,511 - INFO - genre_encoder: 12
+2025-01-06 13:10:50,512 - INFO - Model dimensions from state dict:
+2025-01-06 13:10:50,513 - INFO - num_users: 7773
+2025-01-06 13:10:50,513 - INFO - num_music: 9324
+2025-01-06 13:10:50,514 - INFO - num_artists: 4482
+2025-01-06 13:10:50,514 - INFO - num_genres: 12
+2025-01-06 13:10:50,514 - INFO - num_numerical: 12
+2025-01-06 13:10:50,532 - WARNING - Catalog contains music IDs larger than model capacity. Filtering out excess items.
+2025-01-06 13:11:30,109 - INFO - Loading model from /home/travisboltz/Flask App/checkpoints/best_model.pth
+2025-01-06 13:11:31,174 - INFO - Model loaded successfully
+2025-01-06 13:11:31,218 - INFO - Encoder class counts:
+2025-01-06 13:11:31,219 - INFO - user_encoder: 9717
+2025-01-06 13:11:31,220 - INFO - music_encoder: 9373
+2025-01-06 13:11:31,220 - INFO - artist_encoder: 5059
+2025-01-06 13:11:31,221 - INFO - genre_encoder: 12
+2025-01-06 13:11:31,222 - INFO - Model dimensions from state dict:
+2025-01-06 13:11:31,223 - INFO - num_users: 7773
+2025-01-06 13:11:31,223 - INFO - num_music: 9324
+2025-01-06 13:11:31,224 - INFO - num_artists: 4482
+2025-01-06 13:11:31,224 - INFO - num_genres: 12
+2025-01-06 13:11:31,224 - INFO - num_numerical: 12
+2025-01-06 13:11:31,266 - WARNING - Catalog contains music IDs larger than model capacity. Filtering out excess items.
+2025-01-06 13:12:08,464 - INFO - Loading model from /home/travisboltz/Flask App/checkpoints/best_model.pth
+2025-01-06 13:12:10,113 - INFO - Model loaded successfully
+2025-01-06 13:12:10,159 - INFO - Encoder class counts:
+2025-01-06 13:12:10,161 - INFO - user_encoder: 9717
+2025-01-06 13:12:10,162 - INFO - music_encoder: 9373
+2025-01-06 13:12:10,164 - INFO - artist_encoder: 5059
+2025-01-06 13:12:10,164 - INFO - genre_encoder: 12
+2025-01-06 13:12:10,165 - INFO - Model dimensions from state dict:
+2025-01-06 13:12:10,165 - INFO - num_users: 7773
+2025-01-06 13:12:10,165 - INFO - num_music: 9324
+2025-01-06 13:12:10,166 - INFO - num_artists: 4482
+2025-01-06 13:12:10,166 - INFO - num_genres: 12
+2025-01-06 13:12:10,166 - INFO - num_numerical: 12
+2025-01-06 13:12:10,340 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.24.146.253:5000
+2025-01-06 13:12:10,341 - INFO - [33mPress CTRL+C to quit[0m
+2025-01-06 13:12:10,350 - INFO -  * Restarting with stat
+2025-01-06 13:12:23,653 - INFO - Loading model from /home/travisboltz/Flask App/checkpoints/best_model.pth
+2025-01-06 13:12:24,412 - INFO - Model loaded successfully
+2025-01-06 13:12:24,456 - INFO - Encoder class counts:
+2025-01-06 13:12:24,457 - INFO - user_encoder: 9717
+2025-01-06 13:12:24,458 - INFO - music_encoder: 9373
+2025-01-06 13:12:24,461 - INFO - artist_encoder: 5059
+2025-01-06 13:12:24,462 - INFO - genre_encoder: 12
+2025-01-06 13:12:24,462 - INFO - Model dimensions from state dict:
+2025-01-06 13:12:24,463 - INFO - num_users: 7773
+2025-01-06 13:12:24,463 - INFO - num_music: 9324
+2025-01-06 13:12:24,463 - INFO - num_artists: 4482
+2025-01-06 13:12:24,464 - INFO - num_genres: 12
+2025-01-06 13:12:24,465 - INFO - num_numerical: 12
+2025-01-06 13:12:24,611 - WARNING -  * Debugger is active!
+2025-01-06 13:12:24,613 - INFO -  * Debugger PIN: 849-411-670
+2025-01-06 13:12:24,662 - INFO - 172.24.144.1 - - [06/Jan/2025 13:12:24] "GET /api/health HTTP/1.1" 200 -
+2025-01-06 13:13:10,894 - INFO - 172.24.144.1 - - [06/Jan/2025 13:13:10] "GET /api/health HTTP/1.1" 200 -
+2025-01-06 13:13:39,790 - INFO - 172.24.144.1 - - [06/Jan/2025 13:13:39] "GET /api/health HTTP/1.1" 200 -
+2025-01-06 13:14:09,295 - INFO - 172.24.144.1 - - [06/Jan/2025 13:14:09] "GET /api/health HTTP/1.1" 200 -
+2025-01-06 13:14:22,003 - INFO - 172.24.144.1 - - [06/Jan/2025 13:14:22] "GET /api/health HTTP/1.1" 200 -
+2025-01-06 13:14:22,014 - INFO - 172.24.144.1 - - [06/Jan/2025 13:14:22] "GET /api/health HTTP/1.1" 200 -
+2025-01-06 13:14:27,224 - INFO - 172.24.144.1 - - [06/Jan/2025 13:14:27] "OPTIONS /api/recommendations HTTP/1.1" 200 -
+2025-01-06 13:14:27,366 - WARNING - Error encoding user ID: y contains previously unseen labels: '2@2.com'
+2025-01-06 13:14:27,371 - WARNING - Using default encoding (0)
+2025-01-06 13:14:27,437 - WARNING - Error in transform: y contains previously unseen labels: '0'
+2025-01-06 13:14:27,438 - WARNING - Using default value 0 for 13421 items
+2025-01-06 13:14:36,848 - INFO - 172.24.144.1 - - [06/Jan/2025 13:14:36] "POST /api/recommendations HTTP/1.1" 200 -
+2025-01-06 13:19:58,341 - INFO - 172.24.144.1 - - [06/Jan/2025 13:19:58] "GET /api/health HTTP/1.1" 200 -
+2025-01-06 13:19:58,746 - INFO - 172.24.144.1 - - [06/Jan/2025 13:19:58] "GET /api/health HTTP/1.1" 200 -
