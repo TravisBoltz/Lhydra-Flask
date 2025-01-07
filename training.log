@@ -2262,3 +2262,102 @@ Bias Analysis:
 2025-01-07 03:02:45,208 - INFO -  * Debugger PIN: 849-411-670
 2025-01-07 03:20:41,647 - INFO -  * Detected change in '/home/travisboltz/Flask App/app.py', reloading
 2025-01-07 03:20:44,931 - INFO -  * Restarting with stat
+2025-01-07 03:20:52,402 - INFO - Loading model from /home/travisboltz/Flask App/checkpoints/best_model.pth
+2025-01-07 03:20:53,272 - INFO - Model loaded successfully
+2025-01-07 03:20:53,288 - INFO - Encoder class counts:
+2025-01-07 03:20:53,288 - INFO - user_encoder: 9717
+2025-01-07 03:20:53,289 - INFO - music_encoder: 9373
+2025-01-07 03:20:53,289 - INFO - artist_encoder: 5059
+2025-01-07 03:20:53,289 - INFO - genre_encoder: 12
+2025-01-07 03:20:53,289 - INFO - Model dimensions from state dict:
+2025-01-07 03:20:53,289 - INFO - num_users: 7773
+2025-01-07 03:20:53,289 - INFO - num_music: 9324
+2025-01-07 03:20:53,290 - INFO - num_artists: 4482
+2025-01-07 03:20:53,290 - INFO - num_genres: 12
+2025-01-07 03:20:53,290 - INFO - num_numerical: 12
+2025-01-07 03:20:53,374 - WARNING -  * Debugger is active!
+2025-01-07 03:20:53,377 - INFO -  * Debugger PIN: 849-411-670
+2025-01-07 03:46:35,478 - INFO - Loading model from /home/travisboltz/Flask App/checkpoints/best_model.pth
+2025-01-07 03:46:35,922 - INFO - Model loaded successfully
+2025-01-07 03:46:35,938 - INFO - Encoder class counts:
+2025-01-07 03:46:35,938 - INFO - user_encoder: 9717
+2025-01-07 03:46:35,938 - INFO - music_encoder: 9373
+2025-01-07 03:46:35,938 - INFO - artist_encoder: 5059
+2025-01-07 03:46:35,938 - INFO - genre_encoder: 12
+2025-01-07 03:46:35,938 - INFO - Model dimensions from state dict:
+2025-01-07 03:46:35,938 - INFO - num_users: 7773
+2025-01-07 03:46:35,939 - INFO - num_music: 9324
+2025-01-07 03:46:35,939 - INFO - num_artists: 4482
+2025-01-07 03:46:35,939 - INFO - num_genres: 12
+2025-01-07 03:46:35,939 - INFO - num_numerical: 12
+2025-01-07 03:48:40,227 - INFO - Loading model from /home/travisboltz/Flask App/checkpoints/best_model.pth
+2025-01-07 03:48:41,754 - INFO - Model loaded successfully
+2025-01-07 03:48:41,768 - INFO - Encoder class counts:
+2025-01-07 03:48:41,769 - INFO - user_encoder: 9717
+2025-01-07 03:48:41,769 - INFO - music_encoder: 9373
+2025-01-07 03:48:41,769 - INFO - artist_encoder: 5059
+2025-01-07 03:48:41,769 - INFO - genre_encoder: 12
+2025-01-07 03:48:41,769 - INFO - Model dimensions from state dict:
+2025-01-07 03:48:41,769 - INFO - num_users: 7773
+2025-01-07 03:48:41,769 - INFO - num_music: 9324
+2025-01-07 03:48:41,769 - INFO - num_artists: 4482
+2025-01-07 03:48:41,769 - INFO - num_genres: 12
+2025-01-07 03:48:41,770 - INFO - num_numerical: 12
+2025-01-07 03:48:41,846 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.24.146.253:5000
+2025-01-07 03:48:41,846 - INFO - [33mPress CTRL+C to quit[0m
+2025-01-07 03:48:41,848 - INFO -  * Restarting with stat
+2025-01-07 03:48:46,021 - INFO - Loading model from /home/travisboltz/Flask App/checkpoints/best_model.pth
+2025-01-07 03:48:46,538 - INFO - Model loaded successfully
+2025-01-07 03:48:46,551 - INFO - Encoder class counts:
+2025-01-07 03:48:46,551 - INFO - user_encoder: 9717
+2025-01-07 03:48:46,551 - INFO - music_encoder: 9373
+2025-01-07 03:48:46,551 - INFO - artist_encoder: 5059
+2025-01-07 03:48:46,552 - INFO - genre_encoder: 12
+2025-01-07 03:48:46,552 - INFO - Model dimensions from state dict:
+2025-01-07 03:48:46,552 - INFO - num_users: 7773
+2025-01-07 03:48:46,552 - INFO - num_music: 9324
+2025-01-07 03:48:46,552 - INFO - num_artists: 4482
+2025-01-07 03:48:46,552 - INFO - num_genres: 12
+2025-01-07 03:48:46,552 - INFO - num_numerical: 12
+2025-01-07 03:48:46,596 - WARNING -  * Debugger is active!
+2025-01-07 03:48:46,598 - INFO -  * Debugger PIN: 849-411-670
+2025-01-07 03:54:04,228 - INFO - 172.24.144.1 - - [07/Jan/2025 03:54:04] "[33mGET / HTTP/1.1[0m" 404 -
+2025-01-07 03:54:06,489 - INFO - 172.24.144.1 - - [07/Jan/2025 03:54:06] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-01-07 03:54:10,911 - INFO - 172.24.144.1 - - [07/Jan/2025 03:54:10] "[33mGET /routes HTTP/1.1[0m" 404 -
+2025-01-07 04:39:30,075 - INFO -  * Detected change in '/home/travisboltz/Flask App/app.py', reloading
+2025-01-07 04:39:32,898 - INFO -  * Restarting with stat
+2025-01-07 04:39:41,197 - INFO - Loading model from /home/travisboltz/Flask App/checkpoints/best_model.pth
+2025-01-07 04:39:41,877 - INFO - Model loaded successfully
+2025-01-07 04:39:41,894 - INFO - Encoder class counts:
+2025-01-07 04:39:41,895 - INFO - user_encoder: 9717
+2025-01-07 04:39:41,895 - INFO - music_encoder: 9373
+2025-01-07 04:39:41,895 - INFO - artist_encoder: 5059
+2025-01-07 04:39:41,895 - INFO - genre_encoder: 12
+2025-01-07 04:39:41,895 - INFO - Model dimensions from state dict:
+2025-01-07 04:39:41,895 - INFO - num_users: 7773
+2025-01-07 04:39:41,895 - INFO - num_music: 9324
+2025-01-07 04:39:41,895 - INFO - num_artists: 4482
+2025-01-07 04:39:41,896 - INFO - num_genres: 12
+2025-01-07 04:39:41,896 - INFO - num_numerical: 12
+2025-01-07 04:39:41,968 - WARNING -  * Debugger is active!
+2025-01-07 04:39:41,972 - INFO -  * Debugger PIN: 849-411-670
+2025-01-07 04:39:42,994 - INFO -  * Detected change in '/home/travisboltz/Flask App/app.py', reloading
+2025-01-07 04:39:43,852 - INFO -  * Restarting with stat
+2025-01-07 04:39:48,419 - INFO - Loading model from /home/travisboltz/Flask App/checkpoints/best_model.pth
+2025-01-07 04:39:48,626 - INFO - Model loaded successfully
+2025-01-07 04:39:48,634 - INFO - Encoder class counts:
+2025-01-07 04:39:48,635 - INFO - user_encoder: 9717
+2025-01-07 04:39:48,635 - INFO - music_encoder: 9373
+2025-01-07 04:39:48,635 - INFO - artist_encoder: 5059
+2025-01-07 04:39:48,635 - INFO - genre_encoder: 12
+2025-01-07 04:39:48,635 - INFO - Model dimensions from state dict:
+2025-01-07 04:39:48,635 - INFO - num_users: 7773
+2025-01-07 04:39:48,635 - INFO - num_music: 9324
+2025-01-07 04:39:48,636 - INFO - num_artists: 4482
+2025-01-07 04:39:48,636 - INFO - num_genres: 12
+2025-01-07 04:39:48,636 - INFO - num_numerical: 12
+2025-01-07 04:39:48,670 - WARNING -  * Debugger is active!
+2025-01-07 04:39:48,672 - INFO -  * Debugger PIN: 849-411-670

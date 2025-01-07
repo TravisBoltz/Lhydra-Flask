@@ -42,6 +42,20 @@ try:
 except Exception as e:
     print(f"Error loading model: {str(e)}")
     raise
+@app.route('/routes', methods=['GET'])
+def list_routes():
+    routes = []
+    for rule in app.url_map.iter_rules():
+        routes.append({
+            "endpoint": rule.endpoint,
+            "methods": list(rule.methods),
+            "url": str(rule)
+        })
+    return {"routes": routes}, 200
+
+@app.route('/')
+def home():
+    return "Welcome to the app!"
 
 @app.route('/api/recommendations', methods=['POST'])
 def get_recommendations():
