@@ -11,15 +11,9 @@ from generate_recommendations import RecommendationGenerator
 app = Flask(__name__)
 
 # Updated CORS configuration with additional options
-CORS(app, resources={
-    r"/api/*": {
-        "origins": ["https://lhydra.com", "http://localhost:3000"],
-        "methods": ["GET", "POST", "OPTIONS"],
-        "allow_headers": ["Content-Type", "Authorization"],
-        "expose_headers": ["Content-Range", "X-Content-Range"],
-        "supports_credentials": True
-    }
-})
+
+CORS(app, resources={r"/*": {"origins": "*"}})
+print("CORS is configured")
 
 # Setup paths relative to new project structure
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
