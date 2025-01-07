@@ -9,7 +9,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from generate_recommendations import RecommendationGenerator
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/api/*": {"origins": ["https://lhydra-flask.onrender.com", "http://localhost:3000"]}})
 
 # Setup paths relative to new project structure
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))

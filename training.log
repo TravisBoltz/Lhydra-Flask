@@ -2110,3 +2110,68 @@ Bias Analysis:
 2025-01-06 13:23:47,584 - INFO - 172.24.144.1 - - [06/Jan/2025 13:23:47] "GET /api/health HTTP/1.1" 200 -
 2025-01-06 13:23:49,850 - INFO - 172.24.144.1 - - [06/Jan/2025 13:23:49] "GET /api/health HTTP/1.1" 200 -
 2025-01-06 13:23:51,641 - INFO - 172.24.144.1 - - [06/Jan/2025 13:23:51] "GET /api/health HTTP/1.1" 200 -
+2025-01-06 22:32:15,629 - INFO - 172.24.144.1 - - [06/Jan/2025 22:32:15] "GET /api/health HTTP/1.1" 200 -
+2025-01-06 22:32:15,778 - INFO - 172.24.144.1 - - [06/Jan/2025 22:32:15] "GET /api/health HTTP/1.1" 200 -
+2025-01-06 22:32:15,794 - INFO - 172.24.144.1 - - [06/Jan/2025 22:32:15] "GET /api/health HTTP/1.1" 200 -
+2025-01-06 22:36:19,008 - INFO - 172.24.144.1 - - [06/Jan/2025 22:36:19] "GET /api/health HTTP/1.1" 200 -
+2025-01-06 22:36:38,415 - INFO - 172.24.144.1 - - [06/Jan/2025 22:36:38] "GET /api/health HTTP/1.1" 200 -
+2025-01-06 22:36:53,599 - INFO - 172.24.144.1 - - [06/Jan/2025 22:36:53] "GET /api/health HTTP/1.1" 200 -
+2025-01-06 22:36:53,617 - INFO - 172.24.144.1 - - [06/Jan/2025 22:36:53] "GET /api/health HTTP/1.1" 200 -
+2025-01-06 22:36:53,878 - INFO - 172.24.144.1 - - [06/Jan/2025 22:36:53] "GET /api/health HTTP/1.1" 200 -
+2025-01-06 22:37:26,203 - INFO - 172.24.144.1 - - [06/Jan/2025 22:37:26] "GET /api/health HTTP/1.1" 200 -
+2025-01-06 22:37:26,210 - INFO - 172.24.144.1 - - [06/Jan/2025 22:37:26] "GET /api/health HTTP/1.1" 200 -
+2025-01-06 22:37:26,364 - INFO - 172.24.144.1 - - [06/Jan/2025 22:37:26] "GET /api/health HTTP/1.1" 200 -
+2025-01-06 22:37:34,040 - INFO - 172.24.144.1 - - [06/Jan/2025 22:37:34] "GET /api/health HTTP/1.1" 200 -
+2025-01-06 22:37:34,045 - INFO - 172.24.144.1 - - [06/Jan/2025 22:37:34] "GET /api/health HTTP/1.1" 200 -
+2025-01-06 22:37:34,163 - INFO - 172.24.144.1 - - [06/Jan/2025 22:37:34] "GET /api/health HTTP/1.1" 200 -
+2025-01-07 00:34:10,459 - INFO -  * Detected change in '/home/travisboltz/Flask App/app.py', reloading
+2025-01-07 00:34:15,312 - INFO -  * Restarting with stat
+2025-01-07 00:34:22,619 - INFO - Loading model from /home/travisboltz/Flask App/checkpoints/best_model.pth
+2025-01-07 00:34:23,255 - INFO - Model loaded successfully
+2025-01-07 00:34:23,271 - INFO - Encoder class counts:
+2025-01-07 00:34:23,271 - INFO - user_encoder: 9717
+2025-01-07 00:34:23,271 - INFO - music_encoder: 9373
+2025-01-07 00:34:23,271 - INFO - artist_encoder: 5059
+2025-01-07 00:34:23,271 - INFO - genre_encoder: 12
+2025-01-07 00:34:23,271 - INFO - Model dimensions from state dict:
+2025-01-07 00:34:23,272 - INFO - num_users: 7773
+2025-01-07 00:34:23,272 - INFO - num_music: 9324
+2025-01-07 00:34:23,272 - INFO - num_artists: 4482
+2025-01-07 00:34:23,272 - INFO - num_genres: 12
+2025-01-07 00:34:23,272 - INFO - num_numerical: 12
+2025-01-07 00:34:23,354 - WARNING -  * Debugger is active!
+2025-01-07 00:34:23,357 - INFO -  * Debugger PIN: 849-411-670
+2025-01-07 00:35:13,106 - INFO -  * Detected change in '/home/travisboltz/Flask App/app.py', reloading
+2025-01-07 00:35:13,994 - INFO -  * Restarting with stat
+2025-01-07 00:35:17,224 - INFO - Loading model from /home/travisboltz/Flask App/checkpoints/best_model.pth
+2025-01-07 00:35:17,492 - INFO - Model loaded successfully
+2025-01-07 00:35:17,505 - INFO - Encoder class counts:
+2025-01-07 00:35:17,505 - INFO - user_encoder: 9717
+2025-01-07 00:35:17,505 - INFO - music_encoder: 9373
+2025-01-07 00:35:17,505 - INFO - artist_encoder: 5059
+2025-01-07 00:35:17,505 - INFO - genre_encoder: 12
+2025-01-07 00:35:17,505 - INFO - Model dimensions from state dict:
+2025-01-07 00:35:17,506 - INFO - num_users: 7773
+2025-01-07 00:35:17,506 - INFO - num_music: 9324
+2025-01-07 00:35:17,506 - INFO - num_artists: 4482
+2025-01-07 00:35:17,506 - INFO - num_genres: 12
+2025-01-07 00:35:17,506 - INFO - num_numerical: 12
+2025-01-07 00:35:17,548 - WARNING -  * Debugger is active!
+2025-01-07 00:35:17,549 - INFO -  * Debugger PIN: 849-411-670
+2025-01-07 00:35:18,568 - INFO -  * Detected change in '/home/travisboltz/Flask App/app.py', reloading
+2025-01-07 00:35:19,380 - INFO -  * Restarting with stat
+2025-01-07 00:35:22,362 - INFO - Loading model from /home/travisboltz/Flask App/checkpoints/best_model.pth
+2025-01-07 00:35:22,576 - INFO - Model loaded successfully
+2025-01-07 00:35:22,586 - INFO - Encoder class counts:
+2025-01-07 00:35:22,587 - INFO - user_encoder: 9717
+2025-01-07 00:35:22,587 - INFO - music_encoder: 9373
+2025-01-07 00:35:22,587 - INFO - artist_encoder: 5059
+2025-01-07 00:35:22,588 - INFO - genre_encoder: 12
+2025-01-07 00:35:22,588 - INFO - Model dimensions from state dict:
+2025-01-07 00:35:22,588 - INFO - num_users: 7773
+2025-01-07 00:35:22,588 - INFO - num_music: 9324
+2025-01-07 00:35:22,588 - INFO - num_artists: 4482
+2025-01-07 00:35:22,588 - INFO - num_genres: 12
+2025-01-07 00:35:22,588 - INFO - num_numerical: 12
+2025-01-07 00:35:22,630 - WARNING -  * Debugger is active!
+2025-01-07 00:35:22,630 - INFO -  * Debugger PIN: 849-411-670
