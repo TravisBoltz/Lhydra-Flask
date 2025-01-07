@@ -9,8 +9,17 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from generate_recommendations import RecommendationGenerator
 
 app = Flask(__name__)
-# CORS(app, resources={r"/api/*": {"origins": ["https://lhydra.com", "http://localhost:3000"]}})
-CORS(app, resources={r"/api/*": {"origins": ["https://lhydra.com", "http://localhost:3000"]}})
+
+# Updated CORS configuration with additional options
+CORS(app, resources={
+    r"/api/*": {
+        "origins": ["https://lhydra.com", "http://localhost:3000"],
+        "methods": ["GET", "POST", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization"],
+        "expose_headers": ["Content-Range", "X-Content-Range"],
+        "supports_credentials": True
+    }
+})
 
 # Setup paths relative to new project structure
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -31,17 +40,27 @@ try:
         raise FileNotFoundError(f"Data file not found at {DATA_PATH}")
     if not os.path.exists(ENCODERS_PATH):
         raise FileNotFoundError(f"Encoders file not found at {ENCODERS_PATH}")
-        
+    
     catalog_data = pd.read_csv(DATA_PATH)
     recommender = RecommendationGenerator(
         model_path=MODEL_PATH,
         catalog_data=catalog_data,
-        encoders_path=ENCODERS_PATH  # Pass encoders path to RecommendationGenerator
+        encoders_path=ENCODERS_PATH
     )
     print("Model loaded successfully")
 except Exception as e:
     print(f"Error loading model: {str(e)}")
     raise
+
+@app.after_request
+def after_request(response):
+    """Add headers to every response."""
+    response.headers.add('Access-Control-Allow-Origin', 'http://localhost:3000')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+    response.headers.add('Access-Control-Allow-Credentials', 'true')
+    return response
+
 @app.route('/routes', methods=['GET'])
 def list_routes():
     routes = []
@@ -57,8 +76,11 @@ def list_routes():
 def home():
     return "Welcome to the app!"
 
-@app.route('/api/recommendations', methods=['POST'])
+@app.route('/api/recommendations', methods=['POST', 'OPTIONS'])
 def get_recommendations():
+    if request.method == 'OPTIONS':
+        return '', 200
+        
     try:
         data = request.json
         user_info = {
