@@ -2260,3 +2260,5 @@ Bias Analysis:
 2025-01-07 03:02:45,176 - INFO - num_numerical: 12
 2025-01-07 03:02:45,207 - WARNING -  * Debugger is active!
 2025-01-07 03:02:45,208 - INFO -  * Debugger PIN: 849-411-670
+2025-01-07 03:20:41,647 - INFO -  * Detected change in '/home/travisboltz/Flask App/app.py', reloading
+2025-01-07 03:20:44,931 - INFO -  * Restarting with stat

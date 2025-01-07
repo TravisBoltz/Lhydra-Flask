@@ -10,7 +10,7 @@ from generate_recommendations import RecommendationGenerator
 
 app = Flask(__name__)
 # CORS(app, resources={r"/api/*": {"origins": ["https://lhydra.com", "http://localhost:3000"]}})
-CORS(app, resources={r"/api/*": {"origins": ["http://localhost:3000", "https://lhydra.com"]}})
+CORS(app, resources={r"/api/*": {"origins": ["https://lhydra.com", "http://localhost:3000"]}})
 
 # Setup paths relative to new project structure
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -70,11 +70,6 @@ def get_recommendations():
 @app.route('/api/health', methods=['GET'])
 def health_check():
     return jsonify({'status': 'healthy'})
-
-@app.after_request
-def apply_cors(response):
-    response.headers['Access-Control-Allow-Origin'] = 'http://localhost:3000'  
-    return response
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
