@@ -2524,3 +2524,77 @@ Bias Analysis:
 2025-01-07 11:15:06,527 - INFO - num_artists: 4482
 2025-01-07 11:15:06,527 - INFO - num_genres: 12
 2025-01-07 11:15:06,527 - INFO - num_numerical: 12
+2025-01-07 12:08:16,644 - INFO - Loading model from /home/travisboltz/Flask App/checkpoints/best_model.pth
+2025-01-07 12:08:17,890 - INFO - Model loaded successfully
+2025-01-07 12:08:17,930 - INFO - Encoder class counts:
+2025-01-07 12:08:17,930 - INFO - user_encoder: 9717
+2025-01-07 12:08:17,930 - INFO - music_encoder: 9373
+2025-01-07 12:08:17,930 - INFO - artist_encoder: 5059
+2025-01-07 12:08:17,931 - INFO - genre_encoder: 12
+2025-01-07 12:08:17,931 - INFO - Model dimensions from state dict:
+2025-01-07 12:08:17,931 - INFO - num_users: 7773
+2025-01-07 12:08:17,931 - INFO - num_music: 9324
+2025-01-07 12:08:17,931 - INFO - num_artists: 4482
+2025-01-07 12:08:17,931 - INFO - num_genres: 12
+2025-01-07 12:08:17,931 - INFO - num_numerical: 12
+2025-01-07 12:08:18,025 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8000
+ * Running on http://172.24.146.253:8000
+2025-01-07 12:08:18,025 - INFO - [33mPress CTRL+C to quit[0m
+2025-01-07 12:30:12,851 - INFO - 172.24.144.1 - - [07/Jan/2025 12:30:12] "[35m[1mPOST /api/recommendations?user_id=user123&age=25&gender=F&genre=rock&music=pop HTTP/1.1[0m" 500 -
+2025-01-07 12:30:33,686 - INFO - 172.24.144.1 - - [07/Jan/2025 12:30:33] "[35m[1mPOST /api/recommendations?user_id=user123&age=25&gender=F&genre=rock&music=pop HTTP/1.1[0m" 500 -
+2025-01-07 12:31:34,075 - INFO - 172.24.144.1 - - [07/Jan/2025 12:31:34] "GET /api/health HTTP/1.1" 200 -
+2025-01-07 12:31:34,084 - INFO - 172.24.144.1 - - [07/Jan/2025 12:31:34] "GET /api/health HTTP/1.1" 200 -
+2025-01-07 12:31:34,612 - INFO - 172.24.144.1 - - [07/Jan/2025 12:31:34] "GET /api/health HTTP/1.1" 200 -
+2025-01-07 12:31:42,471 - INFO - 172.24.144.1 - - [07/Jan/2025 12:31:42] "OPTIONS /api/recommendations HTTP/1.1" 200 -
+2025-01-07 12:31:42,871 - WARNING - Error encoding user ID: y contains previously unseen labels: '2@2.com'
+2025-01-07 12:31:42,872 - WARNING - Using default encoding (0)
+2025-01-07 12:31:42,913 - WARNING - Error in transform: y contains previously unseen labels: '0'
+2025-01-07 12:31:42,914 - WARNING - Using default value 0 for 13421 items
+2025-01-07 12:31:46,428 - INFO - 172.24.144.1 - - [07/Jan/2025 12:31:46] "POST /api/recommendations HTTP/1.1" 200 -
+2025-01-07 12:31:46,612 - INFO - 172.24.144.1 - - [07/Jan/2025 12:31:46] "GET /api/health HTTP/1.1" 200 -
+2025-01-07 12:31:50,201 - INFO - 172.24.144.1 - - [07/Jan/2025 12:31:50] "GET /api/health HTTP/1.1" 200 -
+2025-01-07 12:31:50,310 - INFO - 172.24.144.1 - - [07/Jan/2025 12:31:50] "GET /api/health HTTP/1.1" 200 -
+2025-01-07 12:32:04,479 - INFO - 172.24.144.1 - - [07/Jan/2025 12:32:04] "OPTIONS /api/recommendations HTTP/1.1" 200 -
+2025-01-07 12:32:04,501 - WARNING - Error encoding user ID: y contains previously unseen labels: '2@2.com'
+2025-01-07 12:32:04,501 - WARNING - Using default encoding (0)
+2025-01-07 12:32:04,515 - WARNING - Error in transform: y contains previously unseen labels: '0'
+2025-01-07 12:32:04,516 - WARNING - Using default value 0 for 13421 items
+2025-01-07 12:32:05,800 - INFO - 172.24.144.1 - - [07/Jan/2025 12:32:05] "POST /api/recommendations HTTP/1.1" 200 -
+2025-01-07 12:32:28,090 - INFO - 172.24.144.1 - - [07/Jan/2025 12:32:28] "GET /api/health HTTP/1.1" 200 -
+2025-01-07 12:32:43,918 - INFO - 172.24.144.1 - - [07/Jan/2025 12:32:43] "GET /api/health HTTP/1.1" 200 -
+2025-01-07 12:32:43,935 - INFO - 172.24.144.1 - - [07/Jan/2025 12:32:43] "GET /api/health HTTP/1.1" 200 -
+2025-01-07 12:32:50,004 - INFO - 172.24.144.1 - - [07/Jan/2025 12:32:50] "GET /api/health HTTP/1.1" 200 -
+2025-01-07 12:33:01,596 - INFO - 172.24.144.1 - - [07/Jan/2025 12:33:01] "GET /api/health HTTP/1.1" 200 -
+2025-01-07 12:33:06,291 - INFO - 172.24.144.1 - - [07/Jan/2025 12:33:06] "GET /api/health HTTP/1.1" 200 -
+2025-01-07 21:03:27,649 - INFO - Loading model from /home/travisboltz/Flask App/checkpoints/best_model.pth
+2025-01-07 21:03:28,047 - INFO - Model loaded successfully
+2025-01-07 21:03:28,057 - INFO - Encoder class counts:
+2025-01-07 21:03:28,058 - INFO - user_encoder: 9717
+2025-01-07 21:03:28,058 - INFO - music_encoder: 9373
+2025-01-07 21:03:28,058 - INFO - artist_encoder: 5059
+2025-01-07 21:03:28,058 - INFO - genre_encoder: 12
+2025-01-07 21:03:28,058 - INFO - Model dimensions from state dict:
+2025-01-07 21:03:28,058 - INFO - num_users: 7773
+2025-01-07 21:03:28,058 - INFO - num_music: 9324
+2025-01-07 21:03:28,058 - INFO - num_artists: 4482
+2025-01-07 21:03:28,058 - INFO - num_genres: 12
+2025-01-07 21:03:28,058 - INFO - num_numerical: 12
+2025-01-07 21:03:28,108 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8000
+ * Running on http://172.24.146.253:8000
+2025-01-07 21:03:28,108 - INFO - [33mPress CTRL+C to quit[0m
+2025-01-07 21:10:37,194 - INFO - 172.24.144.1 - - [07/Jan/2025 21:10:37] "GET /api/health HTTP/1.1" 200 -
+2025-01-07 21:10:37,201 - INFO - 172.24.144.1 - - [07/Jan/2025 21:10:37] "GET /api/health HTTP/1.1" 200 -
+2025-01-07 21:10:37,310 - INFO - 172.24.144.1 - - [07/Jan/2025 21:10:37] "GET /api/health HTTP/1.1" 200 -
+2025-01-07 21:10:38,401 - INFO - 172.24.144.1 - - [07/Jan/2025 21:10:38] "GET /api/health HTTP/1.1" 200 -
+2025-01-07 21:10:46,550 - INFO - 172.24.144.1 - - [07/Jan/2025 21:10:46] "OPTIONS /api/recommendations HTTP/1.1" 200 -
+2025-01-07 21:10:46,669 - WARNING - Error encoding user ID: y contains previously unseen labels: '2@2.com'
+2025-01-07 21:10:46,669 - WARNING - Using default encoding (0)
+2025-01-07 21:10:46,679 - WARNING - Error in transform: y contains previously unseen labels: '0'
+2025-01-07 21:10:46,680 - WARNING - Using default value 0 for 13421 items
+2025-01-07 21:10:48,801 - INFO - 172.24.144.1 - - [07/Jan/2025 21:10:48] "POST /api/recommendations HTTP/1.1" 200 -
+2025-01-07 21:13:45,855 - INFO - 172.24.144.1 - - [07/Jan/2025 21:13:45] "GET /api/health HTTP/1.1" 200 -
+2025-01-07 21:14:30,464 - INFO - 172.24.144.1 - - [07/Jan/2025 21:14:30] "GET /api/health HTTP/1.1" 200 -
