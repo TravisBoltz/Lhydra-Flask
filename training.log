@@ -2175,3 +2175,20 @@ Bias Analysis:
 2025-01-07 00:35:22,588 - INFO - num_numerical: 12
 2025-01-07 00:35:22,630 - WARNING -  * Debugger is active!
 2025-01-07 00:35:22,630 - INFO -  * Debugger PIN: 849-411-670
+2025-01-07 00:39:30,514 - INFO -  * Detected change in '/home/travisboltz/Flask App/app.py', reloading
+2025-01-07 00:39:32,630 - INFO -  * Restarting with stat
+2025-01-07 00:39:38,728 - INFO - Loading model from /home/travisboltz/Flask App/checkpoints/best_model.pth
+2025-01-07 00:39:39,247 - INFO - Model loaded successfully
+2025-01-07 00:39:39,267 - INFO - Encoder class counts:
+2025-01-07 00:39:39,267 - INFO - user_encoder: 9717
+2025-01-07 00:39:39,267 - INFO - music_encoder: 9373
+2025-01-07 00:39:39,267 - INFO - artist_encoder: 5059
+2025-01-07 00:39:39,267 - INFO - genre_encoder: 12
+2025-01-07 00:39:39,267 - INFO - Model dimensions from state dict:
+2025-01-07 00:39:39,268 - INFO - num_users: 7773
+2025-01-07 00:39:39,268 - INFO - num_music: 9324
+2025-01-07 00:39:39,268 - INFO - num_artists: 4482
+2025-01-07 00:39:39,268 - INFO - num_genres: 12
+2025-01-07 00:39:39,268 - INFO - num_numerical: 12
+2025-01-07 00:39:39,310 - WARNING -  * Debugger is active!
+2025-01-07 00:39:39,311 - INFO -  * Debugger PIN: 849-411-670
