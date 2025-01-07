@@ -4,18 +4,18 @@ import pandas as pd
 import sys
 import os
 
-# Add parent directory to path to import from sibling directories
+# Add parent directory to path for imports
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from generate_recommendations import RecommendationGenerator
 
 app = Flask(__name__)
 
-# Updated CORS configuration with additional options
+# Load allowed origin from environment variable
+allowed_origin = os.environ.get("ALLOWED_ORIGIN")
+CORS(app, resources={r"/*": {"origins": allowed_origin}}, supports_credentials=True)
+print("CORS is configured with allowed origin:", allowed_origin)
 
-CORS(app, resources={r"/*": {"origins": "*"}})
-print("CORS is configured")
-
-# Setup paths relative to new project structure
+# Setup paths relative to the project structure
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 MODEL_PATH = os.path.join(ROOT_DIR, 'checkpoints', 'best_model.pth')
 DATA_PATH = os.path.join(ROOT_DIR, 'data', 'test_data.csv')
@@ -26,7 +26,7 @@ print(f"Model path: {MODEL_PATH}")
 print(f"Data path: {DATA_PATH}")
 print(f"Encoders path: {ENCODERS_PATH}")
 
-# Initialize model and data (done once at startup)
+# Initialize model and data
 try:
     if not os.path.exists(MODEL_PATH):
         raise FileNotFoundError(f"Model file not found at {MODEL_PATH}")
@@ -46,15 +46,6 @@ except Exception as e:
     print(f"Error loading model: {str(e)}")
     raise
 
-@app.after_request
-def after_request(response):
-    """Add headers to every response."""
-    response.headers.add('Access-Control-Allow-Origin', 'http://localhost:3000')
-    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
-    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
-    response.headers.add('Access-Control-Allow-Credentials', 'true')
-    return response
-
 @app.route('/routes', methods=['GET'])
 def list_routes():
     routes = []
@@ -70,11 +61,8 @@ def list_routes():
 def home():
     return "Welcome to the app!"
 
-@app.route('/api/recommendations', methods=['POST', 'OPTIONS'])
+@app.route('/api/recommendations', methods=['POST'])
 def get_recommendations():
-    if request.method == 'OPTIONS':
-        return '', 200
-        
     try:
         data = request.json
         user_info = {
@@ -100,23 +88,8 @@ def get_recommendations():
 @app.route('/api/health', methods=['GET'])
 def health_check():
     return jsonify({'status': 'healthy'})
-@app.before_request
-def handle_options():
-    if request.method == 'OPTIONS':
-        response = Flask.make_response()
-        response.headers["Access-Control-Allow-Origin"] = "http://localhost:3000"
-        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
-        response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
-        response.headers["Access-Control-Max-Age"] = "3600"
-        return response, 204
-@app.after_request
-def apply_cors(response):
-    response.headers["Access-Control-Allow-Origin"] = "http://localhost:3000"
-    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
-    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
-    return response
 
 if __name__ == '__main__':
-    # Bind to the dynamic port for production platforms like Render
+    # Use dynamic port for production environments
     port = int(os.environ.get('PORT', 8000))
     app.run(host='0.0.0.0', port=port)

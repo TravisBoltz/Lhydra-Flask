@@ -2598,3 +2598,40 @@ Bias Analysis:
 2025-01-07 21:10:48,801 - INFO - 172.24.144.1 - - [07/Jan/2025 21:10:48] "POST /api/recommendations HTTP/1.1" 200 -
 2025-01-07 21:13:45,855 - INFO - 172.24.144.1 - - [07/Jan/2025 21:13:45] "GET /api/health HTTP/1.1" 200 -
 2025-01-07 21:14:30,464 - INFO - 172.24.144.1 - - [07/Jan/2025 21:14:30] "GET /api/health HTTP/1.1" 200 -
+2025-01-07 23:01:07,949 - INFO - 172.24.144.1 - - [07/Jan/2025 23:01:07] "GET /api/health HTTP/1.1" 200 -
+2025-01-07 23:01:18,859 - INFO - 172.24.144.1 - - [07/Jan/2025 23:01:18] "GET /api/health HTTP/1.1" 200 -
+2025-01-07 23:01:18,878 - INFO - 172.24.144.1 - - [07/Jan/2025 23:01:18] "GET /api/health HTTP/1.1" 200 -
+2025-01-07 23:01:19,168 - INFO - 172.24.144.1 - - [07/Jan/2025 23:01:19] "GET /api/health HTTP/1.1" 200 -
+2025-01-07 23:01:23,330 - INFO - 172.24.144.1 - - [07/Jan/2025 23:01:23] "OPTIONS /api/recommendations HTTP/1.1" 200 -
+2025-01-07 23:01:23,661 - WARNING - Error encoding user ID: y contains previously unseen labels: '2@2.com'
+2025-01-07 23:01:23,661 - WARNING - Using default encoding (0)
+2025-01-07 23:01:23,703 - WARNING - Error in transform: y contains previously unseen labels: '0'
+2025-01-07 23:01:23,703 - WARNING - Using default value 0 for 13421 items
+2025-01-07 23:01:26,048 - INFO - 172.24.144.1 - - [07/Jan/2025 23:01:26] "POST /api/recommendations HTTP/1.1" 200 -
+2025-01-07 23:01:38,866 - INFO - 172.24.144.1 - - [07/Jan/2025 23:01:38] "GET /api/health HTTP/1.1" 200 -
+2025-01-07 23:01:38,901 - INFO - 172.24.144.1 - - [07/Jan/2025 23:01:38] "GET /api/health HTTP/1.1" 200 -
+2025-01-07 23:01:42,616 - INFO - 172.24.144.1 - - [07/Jan/2025 23:01:42] "GET /api/health HTTP/1.1" 200 -
+2025-01-07 23:01:42,624 - INFO - 172.24.144.1 - - [07/Jan/2025 23:01:42] "GET /api/health HTTP/1.1" 200 -
+2025-01-07 23:01:58,204 - INFO - 172.24.144.1 - - [07/Jan/2025 23:01:58] "GET /api/health HTTP/1.1" 200 -
+2025-01-07 23:37:52,101 - INFO - 172.24.144.1 - - [07/Jan/2025 23:37:52] "GET /api/health HTTP/1.1" 200 -
+2025-01-07 23:37:52,157 - INFO - 172.24.144.1 - - [07/Jan/2025 23:37:52] "GET /api/health HTTP/1.1" 200 -
+2025-01-07 23:37:52,168 - INFO - 172.24.144.1 - - [07/Jan/2025 23:37:52] "GET /api/health HTTP/1.1" 200 -
+2025-01-07 23:38:01,200 - INFO - 172.24.144.1 - - [07/Jan/2025 23:38:01] "OPTIONS /api/recommendations HTTP/1.1" 200 -
+2025-01-07 23:38:01,325 - WARNING - Error encoding user ID: y contains previously unseen labels: '2@2.com'
+2025-01-07 23:38:01,325 - WARNING - Using default encoding (0)
+2025-01-07 23:38:01,343 - WARNING - Error in transform: y contains previously unseen labels: '0'
+2025-01-07 23:38:01,344 - WARNING - Using default value 0 for 13421 items
+2025-01-07 23:38:03,524 - INFO - 172.24.144.1 - - [07/Jan/2025 23:38:03] "POST /api/recommendations HTTP/1.1" 200 -
+2025-01-07 23:38:41,661 - INFO - 172.24.144.1 - - [07/Jan/2025 23:38:41] "GET /api/health HTTP/1.1" 200 -
+2025-01-07 23:39:16,722 - INFO - 172.24.144.1 - - [07/Jan/2025 23:39:16] "GET /api/health HTTP/1.1" 200 -
+2025-01-07 23:39:18,252 - INFO - 172.24.144.1 - - [07/Jan/2025 23:39:18] "GET /api/health HTTP/1.1" 200 -
+2025-01-07 23:39:23,093 - INFO - 172.24.144.1 - - [07/Jan/2025 23:39:23] "GET /api/health HTTP/1.1" 200 -
+2025-01-07 23:39:26,885 - INFO - 172.24.144.1 - - [07/Jan/2025 23:39:26] "GET /api/health HTTP/1.1" 200 -
+2025-01-07 23:39:37,948 - INFO - 172.24.144.1 - - [07/Jan/2025 23:39:37] "GET /api/health HTTP/1.1" 200 -
+2025-01-07 23:39:37,952 - INFO - 172.24.144.1 - - [07/Jan/2025 23:39:37] "GET /api/health HTTP/1.1" 200 -
+2025-01-07 23:39:38,784 - INFO - 172.24.144.1 - - [07/Jan/2025 23:39:38] "GET /api/health HTTP/1.1" 200 -
+2025-01-07 23:39:38,787 - INFO - 172.24.144.1 - - [07/Jan/2025 23:39:38] "GET /api/health HTTP/1.1" 200 -
+2025-01-07 23:40:01,629 - INFO - 172.24.144.1 - - [07/Jan/2025 23:40:01] "GET /api/health HTTP/1.1" 200 -
+2025-01-07 23:47:11,179 - INFO - 172.24.144.1 - - [07/Jan/2025 23:47:11] "GET /api/health HTTP/1.1" 200 -
+2025-01-07 23:47:26,110 - INFO - 172.24.144.1 - - [07/Jan/2025 23:47:26] "GET /api/health HTTP/1.1" 200 -
+2025-01-07 23:47:35,674 - INFO - 172.24.144.1 - - [07/Jan/2025 23:47:35] "GET /api/health HTTP/1.1" 200 -
