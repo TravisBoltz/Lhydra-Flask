@@ -2635,3 +2635,13 @@ Bias Analysis:
 2025-01-07 23:47:11,179 - INFO - 172.24.144.1 - - [07/Jan/2025 23:47:11] "GET /api/health HTTP/1.1" 200 -
 2025-01-07 23:47:26,110 - INFO - 172.24.144.1 - - [07/Jan/2025 23:47:26] "GET /api/health HTTP/1.1" 200 -
 2025-01-07 23:47:35,674 - INFO - 172.24.144.1 - - [07/Jan/2025 23:47:35] "GET /api/health HTTP/1.1" 200 -
+2025-01-07 23:48:33,241 - INFO - 172.24.144.1 - - [07/Jan/2025 23:48:33] "GET /api/health HTTP/1.1" 200 -
+2025-01-07 23:48:34,515 - INFO - 172.24.144.1 - - [07/Jan/2025 23:48:34] "GET /api/health HTTP/1.1" 200 -
+2025-01-08 00:35:03,226 - INFO - 172.24.144.1 - - [08/Jan/2025 00:35:03] "GET /api/health HTTP/1.1" 200 -
+2025-01-08 00:35:03,307 - INFO - 172.24.144.1 - - [08/Jan/2025 00:35:03] "GET /api/health HTTP/1.1" 200 -
+2025-01-08 00:35:03,368 - INFO - 172.24.144.1 - - [08/Jan/2025 00:35:03] "GET /api/health HTTP/1.1" 200 -
+2025-01-08 00:35:08,805 - INFO - 172.24.144.1 - - [08/Jan/2025 00:35:08] "OPTIONS /api/recommendations HTTP/1.1" 200 -
+2025-01-08 00:35:09,928 - WARNING - Error encoding user ID: y contains previously unseen labels: '2@2.com'
+2025-01-08 00:35:09,929 - WARNING - Using default encoding (0)
+2025-01-08 00:35:10,072 - WARNING - Error in transform: y contains previously unseen labels: '0'
+2025-01-08 00:35:10,082 - WARNING - Using default value 0 for 13421 items

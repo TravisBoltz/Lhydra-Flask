@@ -10,10 +10,10 @@ from generate_recommendations import RecommendationGenerator
 
 app = Flask(__name__)
 
-# Load allowed origin from environment variable
-allowed_origin = os.environ.get("ALLOWED_ORIGIN")
-CORS(app, resources={r"/*": {"origins": allowed_origin}}, supports_credentials=True)
-print("CORS is configured with allowed origin:", allowed_origin)
+# Load allowed origins from environment variable
+allowed_origins = os.environ.get("ALLOWED_ORIGINS", "https://lhydra.com,http://localhost:3000").split(",")
+CORS(app, resources={r"/*": {"origins": allowed_origins}}, supports_credentials=True)
+print("CORS is configured with allowed origins:", allowed_origins)
 
 # Setup paths relative to the project structure
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
