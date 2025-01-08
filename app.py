@@ -9,11 +9,11 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from generate_recommendations import RecommendationGenerator
 
 app = Flask(__name__)
-
-# Load allowed origins from environment variable
-allowed_origins = os.environ.get("ALLOWED_ORIGINS", "http://localhost:3000").split(",")
-CORS(app, resources={r"/*": {"origins": allowed_origins}}, supports_credentials=True)
-print("CORS is configured with allowed origins:", allowed_origins)
+CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
+# # Load allowed origins from environment variable
+# allowed_origins = os.environ.get("ALLOWED_ORIGINS", "http://localhost:3000").split(",")
+# CORS(app, resources={r"/*": {"origins": allowed_origins}}, supports_credentials=True)
+# print("CORS is configured with allowed origins:", allowed_origins)
 
 # Setup paths relative to the project structure
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -61,10 +61,36 @@ def list_routes():
 def home():
     return "Welcome to the app!"
 
+# @app.route('/api/recommendations', methods=['POST'])
+# def get_recommendations():
+#     try:
+#         data = request.json
+#         user_info = {
+#             'user_id': data['user_id'],
+#             'age': int(data['age']),
+#             'gender': data['gender'],
+#             'genre': data['genre'],
+#             'music': data['music']
+#         }
+        
+#         recommendations = recommender.generate_recommendations(user_info, n_recommendations=5)
+        
+#         return jsonify({
+#             'status': 'success',
+#             'recommendations': recommendations.to_dict(orient='records')
+#         })
+#     except Exception as e:
+#         return jsonify({
+#             'status': 'error',
+#             'message': str(e)
+#         }), 500
 @app.route('/api/recommendations', methods=['POST'])
 def get_recommendations():
     try:
+        print("Request received")  # Log start
         data = request.json
+        print("Request data:", data)  # Log data
+        
         user_info = {
             'user_id': data['user_id'],
             'age': int(data['age']),
@@ -72,18 +98,22 @@ def get_recommendations():
             'genre': data['genre'],
             'music': data['music']
         }
-        
+        print("Generating recommendations...")  # Log before calling the model
+
         recommendations = recommender.generate_recommendations(user_info, n_recommendations=5)
-        
+
+        print("Recommendations generated")  # Log success
         return jsonify({
             'status': 'success',
             'recommendations': recommendations.to_dict(orient='records')
         })
     except Exception as e:
+        print("Error occurred:", str(e))  # Log errors
         return jsonify({
             'status': 'error',
             'message': str(e)
         }), 500
+
 
 @app.route('/api/health', methods=['GET'])
 def health_check():
