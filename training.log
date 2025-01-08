@@ -2645,3 +2645,60 @@ Bias Analysis:
 2025-01-08 00:35:09,929 - WARNING - Using default encoding (0)
 2025-01-08 00:35:10,072 - WARNING - Error in transform: y contains previously unseen labels: '0'
 2025-01-08 00:35:10,082 - WARNING - Using default value 0 for 13421 items
+2025-01-08 00:35:23,470 - INFO - 172.24.144.1 - - [08/Jan/2025 00:35:23] "POST /api/recommendations HTTP/1.1" 200 -
+2025-01-08 00:35:39,688 - INFO - 172.24.144.1 - - [08/Jan/2025 00:35:39] "OPTIONS /api/recommendations HTTP/1.1" 200 -
+2025-01-08 00:35:39,754 - WARNING - Error encoding user ID: y contains previously unseen labels: '2@2.com'
+2025-01-08 00:35:39,756 - WARNING - Using default encoding (0)
+2025-01-08 00:35:39,803 - WARNING - Error in transform: y contains previously unseen labels: '0'
+2025-01-08 00:35:39,804 - WARNING - Using default value 0 for 13421 items
+2025-01-08 00:35:45,592 - INFO - 172.24.144.1 - - [08/Jan/2025 00:35:45] "GET /api/health HTTP/1.1" 200 -
+2025-01-08 00:35:47,443 - INFO - 172.24.144.1 - - [08/Jan/2025 00:35:47] "POST /api/recommendations HTTP/1.1" 200 -
+2025-01-08 00:35:49,509 - INFO - 172.24.144.1 - - [08/Jan/2025 00:35:49] "GET /api/health HTTP/1.1" 200 -
+2025-01-08 00:35:52,650 - INFO - 172.24.144.1 - - [08/Jan/2025 00:35:52] "GET /api/health HTTP/1.1" 200 -
+2025-01-08 00:35:52,681 - INFO - 172.24.144.1 - - [08/Jan/2025 00:35:52] "GET /api/health HTTP/1.1" 200 -
+2025-01-08 00:35:59,505 - INFO - 172.24.144.1 - - [08/Jan/2025 00:35:59] "OPTIONS /api/recommendations HTTP/1.1" 200 -
+2025-01-08 00:35:59,588 - WARNING - Error encoding user ID: y contains previously unseen labels: '2@2.com'
+2025-01-08 00:35:59,589 - WARNING - Using default encoding (0)
+2025-01-08 00:35:59,647 - WARNING - Error in transform: y contains previously unseen labels: '0'
+2025-01-08 00:35:59,647 - WARNING - Using default value 0 for 13421 items
+2025-01-08 00:36:02,168 - INFO - 172.24.144.1 - - [08/Jan/2025 00:36:02] "GET /api/health HTTP/1.1" 200 -
+2025-01-08 00:36:11,339 - INFO - 172.24.144.1 - - [08/Jan/2025 00:36:11] "POST /api/recommendations HTTP/1.1" 200 -
+2025-01-08 00:36:22,707 - INFO - 172.24.144.1 - - [08/Jan/2025 00:36:22] "GET /api/health HTTP/1.1" 200 -
+2025-01-08 00:36:52,685 - INFO - 172.24.144.1 - - [08/Jan/2025 00:36:52] "GET /api/health HTTP/1.1" 200 -
+2025-01-08 00:36:54,477 - INFO - 172.24.144.1 - - [08/Jan/2025 00:36:54] "GET /api/health HTTP/1.1" 200 -
+2025-01-08 00:36:54,491 - INFO - 172.24.144.1 - - [08/Jan/2025 00:36:54] "GET /api/health HTTP/1.1" 200 -
+2025-01-08 00:40:25,261 - INFO - 172.24.144.1 - - [08/Jan/2025 00:40:25] "GET /api/health HTTP/1.1" 200 -
+2025-01-08 00:40:25,507 - INFO - 172.24.144.1 - - [08/Jan/2025 00:40:25] "GET /api/health HTTP/1.1" 200 -
+2025-01-08 00:45:43,354 - INFO - 172.24.144.1 - - [08/Jan/2025 00:45:43] "GET /api/health HTTP/1.1" 200 -
+2025-01-08 00:45:43,370 - INFO - 172.24.144.1 - - [08/Jan/2025 00:45:43] "GET /api/health HTTP/1.1" 200 -
+2025-01-08 00:45:43,836 - INFO - 172.24.144.1 - - [08/Jan/2025 00:45:43] "GET /api/health HTTP/1.1" 200 -
+2025-01-08 00:45:47,933 - INFO - 172.24.144.1 - - [08/Jan/2025 00:45:47] "OPTIONS /api/recommendations HTTP/1.1" 200 -
+2025-01-08 00:45:48,029 - WARNING - Error encoding user ID: y contains previously unseen labels: '2@2.com'
+2025-01-08 00:45:48,030 - WARNING - Using default encoding (0)
+2025-01-08 00:45:48,072 - WARNING - Error in transform: y contains previously unseen labels: '0'
+2025-01-08 00:45:48,073 - WARNING - Using default value 0 for 13421 items
+2025-01-08 00:45:55,288 - INFO - 172.24.144.1 - - [08/Jan/2025 00:45:55] "POST /api/recommendations HTTP/1.1" 200 -
+2025-01-08 00:46:01,139 - INFO - 172.24.144.1 - - [08/Jan/2025 00:46:01] "GET /api/health HTTP/1.1" 200 -
+2025-01-08 00:46:28,062 - INFO - 172.24.144.1 - - [08/Jan/2025 00:46:28] "GET /api/health HTTP/1.1" 200 -
+2025-01-08 00:46:28,083 - INFO - 172.24.144.1 - - [08/Jan/2025 00:46:28] "GET /api/health HTTP/1.1" 200 -
+2025-01-08 00:46:28,521 - INFO - 172.24.144.1 - - [08/Jan/2025 00:46:28] "GET /api/health HTTP/1.1" 200 -
+2025-01-08 00:46:31,071 - INFO - 172.24.144.1 - - [08/Jan/2025 00:46:31] "GET /api/health HTTP/1.1" 200 -
+2025-01-08 00:46:35,304 - INFO - 172.24.144.1 - - [08/Jan/2025 00:46:35] "OPTIONS /api/recommendations HTTP/1.1" 200 -
+2025-01-08 00:46:35,450 - WARNING - Error encoding user ID: y contains previously unseen labels: '2@2.com'
+2025-01-08 00:46:35,451 - WARNING - Using default encoding (0)
+2025-01-08 00:46:35,509 - WARNING - Error in transform: y contains previously unseen labels: '0'
+2025-01-08 00:46:35,510 - WARNING - Using default value 0 for 13421 items
+2025-01-08 00:46:44,444 - INFO - 172.24.144.1 - - [08/Jan/2025 00:46:44] "POST /api/recommendations HTTP/1.1" 200 -
+2025-01-08 00:46:52,922 - INFO - 172.24.144.1 - - [08/Jan/2025 00:46:52] "GET /api/health HTTP/1.1" 200 -
+2025-01-08 00:47:21,900 - INFO - 172.24.144.1 - - [08/Jan/2025 00:47:21] "GET /api/health HTTP/1.1" 200 -
+2025-01-08 00:47:24,986 - INFO - 172.24.144.1 - - [08/Jan/2025 00:47:24] "OPTIONS /api/recommendations HTTP/1.1" 200 -
+2025-01-08 00:47:25,063 - WARNING - Error encoding user ID: y contains previously unseen labels: '2@2.com'
+2025-01-08 00:47:25,063 - WARNING - Using default encoding (0)
+2025-01-08 00:47:25,114 - WARNING - Error in transform: y contains previously unseen labels: '0'
+2025-01-08 00:47:25,114 - WARNING - Using default value 0 for 13421 items
+2025-01-08 00:47:32,413 - INFO - 172.24.144.1 - - [08/Jan/2025 00:47:32] "POST /api/recommendations HTTP/1.1" 200 -
+2025-01-08 00:47:49,128 - INFO - 172.24.144.1 - - [08/Jan/2025 00:47:49] "GET /api/health HTTP/1.1" 200 -
+2025-01-08 00:47:54,682 - INFO - 172.24.144.1 - - [08/Jan/2025 00:47:54] "GET /api/health HTTP/1.1" 200 -
+2025-01-08 00:47:59,464 - INFO - 172.24.144.1 - - [08/Jan/2025 00:47:59] "GET /api/health HTTP/1.1" 200 -
+2025-01-08 00:47:59,933 - INFO - 172.24.144.1 - - [08/Jan/2025 00:47:59] "GET /api/health HTTP/1.1" 200 -
+2025-01-08 00:48:00,286 - INFO - 172.24.144.1 - - [08/Jan/2025 00:48:00] "GET /api/health HTTP/1.1" 200 -

@@ -11,7 +11,7 @@ from generate_recommendations import RecommendationGenerator
 app = Flask(__name__)
 
 # Load allowed origins from environment variable
-allowed_origins = os.environ.get("ALLOWED_ORIGINS", "https://lhydra.com,http://localhost:3000").split(",")
+allowed_origins = os.environ.get("ALLOWED_ORIGINS", "http://localhost:3000").split(",")
 CORS(app, resources={r"/*": {"origins": allowed_origins}}, supports_credentials=True)
 print("CORS is configured with allowed origins:", allowed_origins)
 
