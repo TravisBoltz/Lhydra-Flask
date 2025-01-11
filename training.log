@@ -2892,3 +2892,23 @@ Bias Analysis:
 2025-01-09 11:23:49,994 - INFO - 172.24.144.1 - - [09/Jan/2025 11:23:49] "GET /api/health HTTP/1.1" 200 -
 2025-01-09 11:24:20,803 - INFO - 172.24.144.1 - - [09/Jan/2025 11:24:20] "GET /api/health HTTP/1.1" 200 -
 2025-01-09 11:24:49,994 - INFO - 172.24.144.1 - - [09/Jan/2025 11:24:49] "GET /api/health HTTP/1.1" 200 -
+2025-01-10 22:46:41,546 - INFO - Loading model from /home/travisboltz/Flask App/checkpoints/best_model.pth
+2025-01-10 22:46:42,308 - INFO - Model loaded successfully
+2025-01-10 22:46:42,322 - INFO - Encoder class counts:
+2025-01-10 22:46:42,323 - INFO - user_encoder: 9717
+2025-01-10 22:46:42,323 - INFO - music_encoder: 9373
+2025-01-10 22:46:42,323 - INFO - artist_encoder: 5059
+2025-01-10 22:46:42,323 - INFO - genre_encoder: 12
+2025-01-10 22:46:42,323 - INFO - Model dimensions from state dict:
+2025-01-10 22:46:42,323 - INFO - num_users: 7773
+2025-01-10 22:46:42,323 - INFO - num_music: 9324
+2025-01-10 22:46:42,323 - INFO - num_artists: 4482
+2025-01-10 22:46:42,323 - INFO - num_genres: 12
+2025-01-10 22:46:42,323 - INFO - num_numerical: 12
+2025-01-10 22:46:42,394 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8000
+ * Running on http://172.24.146.253:8000
+2025-01-10 22:46:42,394 - INFO - [33mPress CTRL+C to quit[0m
+2025-01-10 22:46:55,099 - INFO - 172.24.144.1 - - [10/Jan/2025 22:46:55] "GET /api/health HTTP/1.1" 200 -
+2025-01-10 22:46:55,125 - INFO - 172.24.144.1 - - [10/Jan/2025 22:46:55] "GET /api/health HTTP/1.1" 200 -
