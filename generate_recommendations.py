@@ -49,62 +49,69 @@ class RecommendationGenerator:
                 logger.warning("Config file not found, using default values")
                 self.config = {
                     'embedding_dim': 64,
+                    # 'hidden_layers': [256, 128, 64],
                     'hidden_layers': [256, 128, 64],
-                    'dropout': 0.3
+                    'dropout': 0.2
                 }
         
         # Load encoders with safety settings
         torch.serialization.add_safe_globals([LabelEncoder])
-        self.encoders = torch.load(encoders_path, weights_only=False)
+        try:
+            encoder_dict = torch.load(encoders_path, weights_only=False)
+            self.encoders = encoder_dict.get('encoder', None)  # This is now a DataEncoder object directly
+            if self.encoders is None:
+                logger.error("Encoder not found in the loaded encoders.")
+                raise ValueError("Encoder not found in the loaded encoders.")
+            logger.info("Encoders loaded successfully")
+        except Exception as e:
+            logger.error(f"Error loading encoders: {str(e)}")
+            raise
         
-        # Print shape info for debugging
-        logger.info("Encoder class counts:")
-        for key, encoder in self.encoders.items():
-            if isinstance(encoder, LabelEncoder):
-                logger.info(f"{key}: {len(encoder.classes_)}")
+        # Ensure DataEncoder is fitted before using
+        if self.encoders is not None and not self.encoders.fitted:
+            logger.info("DataEncoder is not fitted. Fitting now with catalog_data...")
+            self.encoders.fit(self.catalog_data)
         
-        # Get state dict dimensions with safety checks
-        state_dict = self.checkpoint['model_state_dict']
-        self.embedding_dims = {
-            'num_users': state_dict['user_embedding.weight'].shape[0],
-            'num_music': state_dict['music_embedding.weight'].shape[0],
-            'num_artists': state_dict['artist_embedding.weight'].shape[0],
-            'num_genres': len(self.encoders['genre_encoder'].classes_),
-            'num_numerical': 12
-        }
-        
-        logger.info("Model dimensions from state dict:")
-        for key, value in self.embedding_dims.items():
-            logger.info(f"{key}: {value}")
-        
-        # Safety check for catalog data
-        max_music_id = self.catalog_data['music_id'].nunique()
-        if max_music_id >= self.embedding_dims['num_music']:
-            logger.warning(f"Catalog contains music IDs larger than model capacity. Filtering out excess items.")
-            valid_music_ids = set(self.encoders['music_encoder'].transform(
-                self.encoders['music_encoder'].classes_[:self.embedding_dims['num_music']]
-            ))
-            self.catalog_data = self.catalog_data[
-                self.catalog_data['music_id'].apply(
-                    lambda x: self.encoders['music_encoder'].transform([x])[0] in valid_music_ids
-                )
-            ]
-            logger.info(f"Filtered catalog size: {len(self.catalog_data)}")
+        # Get dimensions through the encoder's get_dims method
+        try:
+            dims = self.encoders.get_dims()
+            self.embedding_dims = {
+                'music_dims': dims['music_dims'],
+                'artist_dims': dims['artist_dims'],
+                'genre_dims': dims['genre_dims'],
+                'num_numerical': dims['num_numerical']
+            }
+            logger.info("Model dimensions loaded successfully")
+        except Exception as e:
+            logger.error(f"Error getting dimensions: {str(e)}")
+            raise
+            
+        # Safety check for catalog data - update to use encoder's vocabulary
+        try:
+            max_music_id = self.catalog_data['music'].nunique()
+            if max_music_id >= self.embedding_dims['music_dims']:
+                logger.warning("Catalog contains more music items than model capacity")
+                valid_music = set(self.encoders.music_vectorizer.vocabulary_.keys())
+                self.catalog_data = self.catalog_data[
+                    self.catalog_data['music'].isin(valid_music)
+                ]
+                logger.info(f"Filtered catalog size: {len(self.catalog_data)}")
+        except Exception as e:
+            logger.error(f"Error during catalog validation: {str(e)}")
+            raise
         
         self.model = self._initialize_model(self.embedding_dims)
         
     def _initialize_model(self, embedding_dims):
         """Initialize and load the model from checkpoint."""
-        # Get dimensions from encoders
         model = HybridMusicRecommender(
-            num_users=embedding_dims['num_users'],
-            num_music=embedding_dims['num_music'],
-            num_artists=embedding_dims['num_artists'],
-            num_genres=embedding_dims['num_genres'],
+            music_dims=embedding_dims['music_dims'],
+            artist_dims=embedding_dims['artist_dims'],
+            genre_dims=embedding_dims['genre_dims'],
             num_numerical=embedding_dims['num_numerical'],
-            embedding_dim=64,
-            layers=[256, 128, 64],
-            dropout=0.2
+            embedding_dim=self.config.get('embedding_dim', 64),
+            layers=self.config.get('hidden_layers', [256, 128, 64]),
+            dropout=self.config.get('dropout', 0.2)
         )
         
         # Load state dict from checkpoint
@@ -118,46 +125,38 @@ class RecommendationGenerator:
         return model
     
     def generate_recommendations(self, user_info: dict, n_recommendations: int = 10) -> pd.DataFrame:
-        """
-        Generate music recommendations for a specific user.
-        
-        Args:
-            user_info: Dictionary containing user information (age, gender, user_id)
-            n_recommendations: Number of recommendations to generate
+        """Generate recommendations with complete feature handling."""
+        try:
+            # Create a temporary DataFrame with all songs for the user
+            user_candidates = self.catalog_data.copy()
             
-        Returns:
-            DataFrame containing recommended songs with predicted play counts
-        """
-        # Create a temporary DataFrame with all songs for the user
-        user_candidates = self.catalog_data.copy()
-        user_candidates['age'] = user_info['age']
-        user_candidates['gender'] = user_info['gender']
-        user_candidates['user_id'] = user_info['user_id']
-        
-        # Debug user encoding with more detailed error handling
-        try:
-            encoded_user = self.encoders['user_encoder'].transform([user_info['user_id']])[0]
-            logger.info(f"User ID {user_info['user_id']} encoded as: {encoded_user}")
-        except Exception as e:
-            logger.warning(f"Error encoding user ID: {str(e)}")
-            logger.warning("Using default encoding (0)")
-            encoded_user = 0
-            user_candidates['user_id'] = '0'  # Use default user ID
-        
-        # Debug catalog data
-        print(f"\nCatalog Statistics:")
-        print(f"Total songs: {len(user_candidates)}")
-        print(f"Unique artists: {user_candidates['artist_name'].nunique()}")
-        print(f"Unique genres: {user_candidates['main_genre'].nunique()}")
-        
-        try:
-            # Create dataset with safety checks
+            # Add user information to all candidates
+            user_candidates['age'] = user_info['age']
+            user_candidates['gender'] = user_info.get('gender', 'U')
+            
+            # Handle explicit flag properly
+            if 'explicit' in user_candidates.columns:
+                user_candidates['explicit'] = user_candidates['explicit'].astype(str)
+            else:
+                user_candidates['explicit'] = 'False'
+            
+            # Ensure all required columns are present
+            required_cols = self.encoders.numerical_features + ['music', 'artist_name', 'main_genre']
+            missing_cols = [col for col in required_cols if col not in user_candidates.columns]
+            if missing_cols:
+                logger.warning(f"Missing columns in catalog: {missing_cols}")
+                for col in missing_cols:
+                    user_candidates[col] = 0  # Add default values
+            
+            # Create dataset with complete features
             test_dataset = MusicRecommenderDataset(
                 user_candidates,
                 mode='test',
-                encoders=self.encoders,
-                embedding_dims=self.embedding_dims  # Pass embedding dimensions
+                encoders=self.encoders
             )
+            
+            # ...rest of the recommendation generation code...
+            
             test_loader = DataLoader(test_dataset, batch_size=128, shuffle=False)
             
             # Generate predictions
@@ -207,20 +206,65 @@ class RecommendationGenerator:
         pd.set_option('display.width', None)
         print(recommendations.to_string(index=False, float_format=lambda x: '{:.2f}'.format(x) if isinstance(x, (float, np.float32, np.float64)) else str(x)))
         
-        return recommendations.reset_index(drop=True)
+        # Generate explanations for the top recommendations
+        try:
+            batch = next(iter(test_loader))  # Get the first batch
+            batch = {k: v.to(self.device) for k, v in batch.items()}
+            explanations = self.model.explain_prediction(batch)
+        except Exception as e:
+            logger.warning(f"Could not generate explanations: {str(e)}")
+            explanations = {}
+            
+        recommendations['explanation'] = recommendations.apply(
+            lambda x: self._generate_explanation_text(x, explanations), axis=1
+        )
+        
+        # Convert back to genre names for output
+        try:
+            recommendations['genre'] = self.encoders.genre_encoder.inverse_transform(
+                recommendations['genre'].astype(int)
+            )
+        except ValueError as ve:
+            logger.error(f"Inverse transform failed: {ve}")
+            # Handle invalid genres gracefully
+            recommendations['genre'] = recommendations['genre'].apply(
+                lambda x: self.encoders.genre_encoder.inverse_transform([x])[0] if str(x).isdigit() else 'Unknown'
+            )
+        
+        return recommendations
+
+    def _generate_explanation_text(self, row, explanations):
+        """Generate human-readable explanation for recommendation."""
+        feature_importance = explanations
+        
+        explanation = []
+        if feature_importance.get('genre', 0) > 0.2:
+            explanation.append(f"matches your preferred genre ({row['genre']})")
+        if feature_importance.get('artist', 0) > 0.2:
+            explanation.append("is similar to artists you like")
+        if feature_importance.get('music', 0) > 0.2:
+            explanation.append("features music you enjoy")
+        if feature_importance.get('numerical', 0) > 0.2:
+            explanation.append("aligns with your listening habits")
+        if feature_importance.get('binary', 0) > 0.2:
+            explanation.append("matches your explicit and gender preferences")
+        
+        if not explanation:
+            explanation.append("matches your overall preferences")
+            
+        return "Recommended because it " + " and ".join(explanation)
 
 class HybridMusicRecommender(nn.Module):
-    def __init__(self, num_users, num_music, num_artists, num_genres, num_numerical,
-                 embedding_dim=64, layers=[256, 128, 64], dropout=0.2):
+    def __init__(self, music_dims: int, artist_dims: int, genre_dims: int,
+                 num_numerical: int, embedding_dim=64, layers=[256, 128, 64], dropout=0.2):
         super().__init__()
         
-        # Embedding layers
-        self.user_embedding = nn.Embedding(num_users, embedding_dim)
-        self.music_embedding = nn.Embedding(num_music, embedding_dim)
-        self.artist_embedding = nn.Embedding(num_artists, embedding_dim)
-        self.genre_embedding = nn.Embedding(num_genres, embedding_dim)
+        # Linear layers instead of Embeddings to match checkpoint
+        self.music_layer = nn.Linear(music_dims, embedding_dim)
+        self.artist_layer = nn.Linear(artist_dims, embedding_dim)
+        self.genre_layer = nn.Linear(genre_dims, embedding_dim)
+        self.genre_embedding = nn.Embedding(genre_dims, embedding_dim)  # Keep this for categorical genre encoding
         
-        # Feature processing layers with residual connections
         self.numerical_layer = nn.Sequential(
             nn.Linear(num_numerical, embedding_dim),
             nn.ReLU(),
@@ -233,10 +277,9 @@ class HybridMusicRecommender(nn.Module):
             nn.BatchNorm1d(embedding_dim)
         )
         
-        # Calculate total input features
-        total_features = embedding_dim * 6  # 4 embeddings + numerical + binary
+        # Adjust total features to 5 embeddings * embedding_dim
+        total_features = embedding_dim * 5  # music + artist + genre + numerical + binary
         
-        # MLP layers with residual connections
         self.fc_layers = nn.ModuleList()
         input_dim = total_features
         
@@ -255,11 +298,10 @@ class HybridMusicRecommender(nn.Module):
         self.final_layer = nn.Linear(layers[-1], 1)
     
     def forward(self, batch):
-        # Get embeddings
-        user_emb = self.user_embedding(batch['user_id'])
-        music_emb = self.music_embedding(batch['music_id'])
-        artist_emb = self.artist_embedding(batch['artist_id'])
-        genre_emb = self.genre_embedding(batch['genre_id'])
+        # Process features using Linear layers
+        music_emb = self.music_layer(batch['music_features'].float())
+        artist_emb = self.artist_layer(batch['artist_features'].float())
+        genre_emb = self.genre_embedding(batch['genre_features'])  # Use embedding for categorical
         
         # Process numerical features
         numerical = self.numerical_layer(batch['numerical_features'])
@@ -270,7 +312,7 @@ class HybridMusicRecommender(nn.Module):
         
         # Concatenate all features
         x = torch.cat([
-            user_emb, music_emb, artist_emb, genre_emb, numerical, binary
+            music_emb, artist_emb, genre_emb, numerical, binary
         ], dim=1)
         
         # Apply MLP layers with residual connections
@@ -282,25 +324,34 @@ class HybridMusicRecommender(nn.Module):
         
         # Final prediction
         return self.final_layer(x)
+    
+    def explain_prediction(self, batch):
+        """
+        Generate feature attributions using Integrated Gradients.
+        """
+        return super().explain_prediction(batch)  # Utilize the method from train_model.py
 
 def main():
     # Example usage
-    BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    BASE_DIR = os.getcwd()
     model_path = 'checkpoints/best_model.pth'
-    catalog_data = pd.read_csv(os.path.join(BASE_DIR, 'data', 'test_data.csv'))
-    encoders_path = os.path.join(BASE_DIR, 'data', 'data_encoders.pt')
+    catalog_data = pd.read_csv(os.path.join(BASE_DIR, 'data','processed_data', 'test_data.csv'))
+    encoders_path = os.path.join(BASE_DIR, 'data', 'processed_data', 'encoder.pt')
     
     # Initialize recommendation generator
     recommender = RecommendationGenerator(model_path, catalog_data, encoders_path)
     
-    # Example user
+    # Example user with standardized genres
     user_info = {
         'age': 32,
         'gender': 'M',
-        'genre': 'Pop',
-        'music': 'Shape of You',
-        'user_id': '44d39c6e5e7b45bfc2187fb3c89be58c5a3dc6a54d2a0075402c551c14ea1459'
+        'favourite_genres': ['hip hop', 'classical', 'R&B'],  # Will be standardized
+        'favourite_artists': ['Gunna', 'Drake'],
+        'favourite_music': ['Top Floor', 'Started From the Bottom']
     }
+    
+    # Print available genres before generating recommendations
+    logger.info(f"Available genres: {sorted(recommender.encoders.known_genres)}")
     
     # Generate recommendations
     recommendations = recommender.generate_recommendations(user_info, n_recommendations=10)

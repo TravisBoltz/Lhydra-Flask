@@ -13,9 +13,13 @@ from typing import Tuple, Dict, List
 import json
 from datetime import datetime
 import torch.nn.functional as F
-from sklearn.metrics import mean_squared_error, mean_absolute_error
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 import math
 from encoder_utils import DataEncoder  # Add this import
+import shap
+import lime
+import lime.lime_tabular
+from captum.attr import IntegratedGradients
 
 # Set up logging
 logging.basicConfig(
@@ -29,102 +33,75 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 class MusicRecommenderDataset(Dataset):
-    """Custom Dataset for loading music recommendation data with additional features."""
-    
-    def __init__(self, df: pd.DataFrame, mode: str = 'train', encoders=None, embedding_dims=None):
+    def __init__(self, df: pd.DataFrame, mode: str = 'train', encoders=None):
+        """Initialize dataset with complete feature handling."""
         self.df = df
         self.mode = mode
-        self.embedding_dims = embedding_dims
         
-        if encoders is not None:
-            self.user_encoder = encoders['user_encoder']
-            self.music_encoder = encoders['music_encoder']
-            self.artist_encoder = encoders['artist_encoder']
-            self.genre_encoder = encoders['genre_encoder']
-            self.scaler = encoders['scaler']
-            
-            # Handle unknown values for each encoder
-            def safe_transform(encoder, values, max_index=None, default_value=0):
-                try:
-                    transformed = encoder.transform(values)
-                    if max_index is not None:
-                        # Clip values to be within embedding range
-                        transformed = np.clip(transformed, 0, max_index - 1)
-                    logger.debug(f"Transformed shape: {transformed.shape}")
-                    return transformed
-                except Exception as e:
-                    logger.warning(f"Error in transform: {str(e)}")
-                    logger.warning(f"Using default value {default_value} for {len(values)} items")
-                    return np.array([default_value] * len(values))
-            
-            # Transform with dimension limits
-            max_dims = embedding_dims if embedding_dims else {}
-            self.users = safe_transform(self.user_encoder, df['user_id'].values, 
-                                      max_index=max_dims.get('num_users', None))
-            self.music = safe_transform(self.music_encoder, df['music_id'].values, 
-                                      max_index=max_dims.get('num_music', None))
-            self.artists = safe_transform(self.artist_encoder, df['artist_id'].values, 
-                                        max_index=max_dims.get('num_artists', None))
-            self.genres = safe_transform(self.genre_encoder, df['main_genre'].values, 
-                                       max_index=max_dims.get('num_genres', None))
-            
-            numerical_features = [
-                'age', 'duration', 'acousticness', 'key', 'mode', 'speechiness',
-                'instrumentalness', 'liveness', 'tempo', 'time_signature',
-                'energy_loudness', 'dance_valence'
-            ]
-            
-            # Handle numerical features
-            try:
-                self.numerical_features = self.scaler.transform(df[numerical_features].values)
-            except KeyError as e:
-                logger.warning(f"Missing numerical features: {str(e)}")
-                self.numerical_features = np.zeros((len(df), len(numerical_features)))
-            
-            # Fix this part - Currently using numerical_features[11] which isn't playcount
-            # Instead, use the actual playcount column
-            self.playcount = df['playcount'].values  # Add this line
-        else:
+        if encoders is None:
             raise ValueError("Encoders must be provided")
-
-        # Binary features
-        self.explicit = df['explicit'].astype(int).values
-        self.gender = (df['gender'] == 'M').astype(int).values
-        
-        self.num_users = len(self.user_encoder.classes_)
-        self.num_music = len(self.music_encoder.classes_)
-        self.num_artists = len(self.artist_encoder.classes_)
-        self.num_genres = len(self.genre_encoder.classes_)
-        self.num_numerical = len(numerical_features)
+            
+        try:
+            # Transform all features using encoder
+            features = encoders.transform(df)
+            self.music_features = features['music_features']
+            self.artist_features = features['artist_features']
+            self.genre_features = features['genre_features']
+            self.numerical_features = features['numerical_features']
+            self.explicit = features['explicit']
+            self.gender = features['gender']
+            
+            # Log transform playcount for training data
+            max_value = 1e6
+            self.playcount = np.log1p(
+                np.clip(df['playcount'].values, 0, max_value)
+            ).astype(np.float32)
+            
+        except Exception as e:
+            logger.error(f"Error initializing dataset: {str(e)}")
+            raise
+            
+        # Store sample weights if they exist
+        self.sample_weights = df['sample_weight'].values if 'sample_weight' in df else None
         
     def __len__(self) -> int:
-        return len(self.users)
+        return len(self.df)
     
     def __getitem__(self, idx: int) -> Dict[str, torch.Tensor]:
-        return {
-            'user_id': torch.tensor(self.users[idx], dtype=torch.long),
-            'music_id': torch.tensor(self.music[idx], dtype=torch.long),
-            'artist_id': torch.tensor(self.artists[idx], dtype=torch.long),
-            'genre_id': torch.tensor(self.genres[idx], dtype=torch.long),
-            'numerical_features': torch.tensor(self.numerical_features[idx], dtype=torch.float),
-            'explicit': torch.tensor(self.explicit[idx], dtype=torch.float),
-            'gender': torch.tensor(self.gender[idx], dtype=torch.float),
-            'playcount': torch.tensor(self.playcount[idx], dtype=torch.float)  # Fix this line
-        }
+        """Get item with all required features."""
+        try:
+            item = {
+                'music_features': torch.tensor(self.music_features[idx].toarray(), dtype=torch.float).squeeze(),
+                'artist_features': torch.tensor(self.artist_features[idx].toarray(), dtype=torch.float).squeeze(),
+                'genre_features': torch.tensor(self.genre_features[idx], dtype=torch.long),
+                'numerical_features': torch.tensor(self.numerical_features[idx], dtype=torch.float),
+                'explicit': torch.tensor(self.explicit[idx], dtype=torch.float),
+                'gender': torch.tensor(self.gender[idx], dtype=torch.float),
+                'playcount': torch.tensor(self.playcount[idx], dtype=torch.float)
+            }
+            
+            if self.sample_weights is not None:
+                item['sample_weight'] = torch.tensor(self.sample_weights[idx], dtype=torch.float)
+                
+            return item
+            
+        except Exception as e:
+            logger.error(f"Error getting item {idx}: {str(e)}")
+            raise
 
 class HybridMusicRecommender(nn.Module):
     """Hybrid Neural Collaborative Filtering model with additional features."""
     
-    def __init__(self, num_users: int, num_music: int, num_artists: int, 
-                 num_genres: int, num_numerical: int, embedding_dim: int = 64,
+    def __init__(self, music_dims: int, artist_dims: int, genre_dims: int, 
+                 num_numerical: int, embedding_dim: int = 64,
                  layers: List[int] = [256, 128, 64], dropout: float = 0.2):
         super(HybridMusicRecommender, self).__init__()
         
-        # Embedding layers with proper initialization
-        self.user_embedding = nn.Embedding(num_users, embedding_dim)
-        self.music_embedding = nn.Embedding(num_music, embedding_dim)
-        self.artist_embedding = nn.Embedding(num_artists, embedding_dim)
-        self.genre_embedding = nn.Embedding(num_genres, embedding_dim)
+        # Feature processing layers
+        self.music_layer = nn.Linear(music_dims, embedding_dim)
+        self.artist_layer = nn.Linear(artist_dims, embedding_dim)
+        self.genre_layer = nn.Linear(genre_dims, 64)
+        self.genre_embedding = nn.Embedding(genre_dims, embedding_dim)  # Add genre embedding
         
         # Feature processing layers with residual connections
         self.numerical_layer = nn.Sequential(
@@ -139,7 +116,7 @@ class HybridMusicRecommender(nn.Module):
         )
         
         # Calculate total input features
-        total_features = embedding_dim * 6
+        total_features = embedding_dim * 5
         
         # MLP layers with residual connections
         self.fc_layers = nn.ModuleList()
@@ -162,6 +139,10 @@ class HybridMusicRecommender(nn.Module):
         # Initialize weights
         self._init_weights()
         
+        # Store feature importances for explainability
+        self.feature_importances = None
+        self.ig = IntegratedGradients(self)
+    
     def _init_weights(self):
         """Initialize weights using Kaiming initialization for better gradient flow."""
         for module in self.modules():
@@ -177,15 +158,14 @@ class HybridMusicRecommender(nn.Module):
                 
     def forward(self, batch: Dict[str, torch.Tensor]) -> torch.Tensor:
         # Input validation
-        required_keys = ['user_id', 'music_id', 'artist_id', 'genre_id', 'numerical_features', 'explicit', 'gender']
+        required_keys = ['music_features', 'artist_features', 'genre_features', 'numerical_features', 'explicit', 'gender']
         if not all(key in batch for key in required_keys):
             raise ValueError(f"Missing required keys in batch. Required: {required_keys}")
             
-        # Get embeddings
-        user_emb = self.user_embedding(batch['user_id'])
-        music_emb = self.music_embedding(batch['music_id'])
-        artist_emb = self.artist_embedding(batch['artist_id'])
-        genre_emb = self.genre_embedding(batch['genre_id'])
+        # Process sparse features - squeeze to remove extra dimension
+        music_emb = self.music_layer(batch['music_features'].squeeze(1))
+        artist_emb = self.artist_layer(batch['artist_features'].squeeze(1))
+        genre_emb = self.genre_embedding(batch['genre_features'])  # Use embedding lookup
         
         # Process numerical and binary features
         numerical_features = self.numerical_layer(batch['numerical_features'])
@@ -193,9 +173,16 @@ class HybridMusicRecommender(nn.Module):
             torch.stack([batch['explicit'], batch['gender']], dim=1)
         )
         
+        # Ensure all tensors have same dimensions before concatenating
+        logger.debug(f"Music emb shape: {music_emb.shape}")
+        logger.debug(f"Artist emb shape: {artist_emb.shape}")
+        logger.debug(f"Genre emb shape: {genre_emb.shape}")
+        logger.debug(f"Numerical features shape: {numerical_features.shape}")
+        logger.debug(f"Binary features shape: {binary_features.shape}")
+        
         # Combine all features
         x = torch.cat([
-            user_emb, music_emb, artist_emb, genre_emb, 
+            music_emb, artist_emb, genre_emb, 
             numerical_features, binary_features
         ], dim=1)
         
@@ -208,37 +195,93 @@ class HybridMusicRecommender(nn.Module):
             x = F.relu(x)
         
         return self.final_layer(x).squeeze()
+    
+    def explain_prediction(self, batch: Dict[str, torch.Tensor]) -> Dict[str, float]:
+        """Generate feature attributions using Integrated Gradients."""
+        self.eval()
+        input_tensor = self._prepare_input(batch)
+        target = batch['playcount']
+        
+        attributions = self.ig.attribute(input_tensor, target=target, n_steps=50)
+        attributions = attributions.cpu().detach().numpy()
+        
+        feature_importance = {
+            'music': np.mean(attributions[:, :self.embedding_dims['music_dims']], axis=1).mean(),
+            'artist': np.mean(attributions[:, self.embedding_dims['music_dims']:self.embedding_dims['artist_dims'] + self.embedding_dims['music_dims']], axis=1).mean(),
+            'genre': np.mean(attributions[:, self.embedding_dims['music_dims'] + self.embedding_dims['artist_dims']:self.embedding_dims['genre_dims'] + self.embedding_dims['artist_dims'] + self.embedding_dims['music_dims']], axis=1).mean(),
+            'numerical': np.mean(attributions[:, -self.embedding_dims['num_numerical']:], axis=1).mean(),
+            'binary': np.mean(attributions[:, -2:], axis=1).mean()
+        }
+        
+        return feature_importance
+
+    def _prepare_input(self, batch):
+        """Prepare input tensor for Captum."""
+        # Combine all feature tensors into a single input tensor
+        music = batch['music_features'].float()
+        artist = batch['artist_features'].float()
+        genre = batch['genre_features'].long()
+        numerical = batch['numerical_features'].float()
+        binary = torch.stack([batch['explicit'], batch['gender']], dim=1).float()
+        return torch.cat([music, artist, genre, numerical, binary], dim=1)
+
+    def process_attributions(self, attributions, batch):
+        """Convert raw attributions to a meaningful format."""
+        # Example: Average attributions for each feature type
+        music_attr = attributions[:, :self.music_dims].mean().item()
+        artist_attr = attributions[:, self.music_dims:self.music_dims + self.artist_dims].mean().item()
+        genre_attr = attributions[:, self.music_dims + self.artist_dims:self.music_dims + self.artist_dims + self.genre_dims].mean().item()
+        numerical_attr = attributions[:, -self.numerical_dims:].mean().item()
+        binary_attr = attributions[:, -2:].mean().item()
+        
+        explanations = {
+            'genre': genre_attr,
+            'artist': artist_attr,
+            'music': music_attr,
+            'numerical': numerical_attr,
+            'binary': binary_attr
+        }
+        return explanations
 
 def calculate_ndcg(predictions: torch.Tensor, targets: torch.Tensor, k: int = 10) -> float:
     """
     Calculate NDCG@K for rating predictions.
     For rating predictions, we consider higher predicted ratings as more relevant.
     """
-    # Ensure inputs are on the same device
-    device = predictions.device
-    predictions = predictions.view(-1)  # Flatten predictions
-    targets = targets.view(-1)  # Flatten targets
-    
-    # Sort predictions descending to get top K items
-    _, indices = torch.sort(predictions, descending=True)
-    indices = indices[:k]  # Get top K indices
-    
-    # Get corresponding target values
-    pred_sorted = predictions[indices]
-    target_sorted = targets[indices]
-    
-    # Calculate DCG
-    pos = torch.arange(1, len(indices) + 1, device=device, dtype=torch.float32)
-    dcg = (target_sorted / torch.log2(pos + 1)).sum()
-    
-    # Calculate IDCG
-    ideal_target, _ = torch.sort(targets, descending=True)
-    ideal_target = ideal_target[:k]
-    idcg = (ideal_target / torch.log2(pos + 1)).sum()
-    
-    # Calculate NDCG, handling division by zero
-    ndcg = dcg / (idcg + 1e-8)  # Add small epsilon to avoid division by zero
-    return ndcg.item()
+    try:
+        # Ensure inputs are on the same device and clipped
+        device = predictions.device
+        predictions = torch.clamp(predictions, 0, 1e6)
+        targets = torch.clamp(targets, 0, 1e6)
+        
+        predictions = predictions.view(-1)  # Flatten predictions
+        targets = targets.view(-1)  # Flatten targets
+        
+        # Sort predictions descending to get top K items
+        _, indices = torch.sort(predictions, descending=True)
+        indices = indices[:k]
+        
+        # Get corresponding target values
+        pred_sorted = predictions[indices]
+        target_sorted = targets[indices]
+        
+        # Calculate DCG with stable computation
+        pos = torch.arange(1, len(indices) + 1, device=device, dtype=torch.float32)
+        dcg = (target_sorted / (torch.log2(pos + 1) + 1e-10)).sum()
+        
+        # Calculate IDCG
+        ideal_target, _ = torch.sort(targets, descending=True)
+        ideal_target = ideal_target[:k]
+        idcg = (ideal_target / (torch.log2(pos + 1) + 1e-10)).sum()
+        
+        # Calculate NDCG with proper handling of zero division
+        if idcg == 0:
+            return 0.0
+        ndcg = (dcg / idcg).item()
+        return max(0.0, min(1.0, ndcg))  # Clip to valid range [0, 1]
+    except Exception as e:
+        logger.error(f"Error calculating NDCG: {str(e)}")
+        return 0.0
 
 class Trainer:
     """Trainer class for the hybrid music recommender model."""
@@ -270,7 +313,7 @@ class Trainer:
         )
         
         # Early stopping configuration
-        self.early_stopping_patience = config.get('early_stopping_patience', 10)
+        self.early_stopping_patience = config.get('early_stopping_patience', 5)
         self.best_val_loss = float('inf')
         self.patience_counter = 0
         
@@ -299,66 +342,117 @@ class Trainer:
         return self.l1_lambda * l1_loss
         
     def calculate_metrics(self, predictions: torch.Tensor, targets: torch.Tensor) -> Dict[str, float]:
-        """Calculate training metrics."""
-        # Convert tensors to numpy for sklearn metrics
-        predictions = predictions.cpu().numpy()
-        targets = targets.cpu().numpy()
-        
-        # Calculate basic metrics
-        mse = mean_squared_error(targets, predictions)
-        rmse = math.sqrt(mse)
-        mae = mean_absolute_error(targets)
-        
-        # Calculate NDCG using tensor inputs
-        ndcg = calculate_ndcg(
-            torch.tensor(predictions, device=self.device),
-            torch.tensor(targets, device=self.device),
-            k=10
-        )
-        
-        return {
-            'loss': mse,
-            'rmse': rmse,
-            'mae': mae,
-            'ndcg': ndcg
-        }
-        
+        """Calculate training metrics with sklearn's new API."""
+        try:
+            predictions = predictions.detach().cpu()
+            targets = targets.detach().cpu()
+            
+            predictions = torch.clamp(predictions, -10, 10)
+            targets = torch.clamp(targets, -10, 10)
+            
+            predictions_original = torch.clamp(torch.expm1(predictions), 0, 1e4).numpy()
+            targets_original = torch.clamp(torch.expm1(targets), 0, 1e4).numpy()
+            
+            try:
+                # Use root_mean_squared_error directly instead of mean_squared_error
+                from sklearn.metrics import mean_absolute_error, r2_score, root_mean_squared_error
+                
+                rmse = root_mean_squared_error(
+                    targets_original,
+                    predictions_original,
+                    sample_weight=None
+                )
+                
+                mae = mean_absolute_error(
+                    targets_original,
+                    predictions_original
+                )
+                
+                r2 = r2_score(
+                    targets_original,
+                    predictions_original,
+                    sample_weight=None
+                )
+                
+                # Calculate NDCG
+                ndcg = calculate_ndcg(
+                    torch.tensor(predictions_original),
+                    torch.tensor(targets_original),
+                    k=10
+                )
+                
+                # Validate metrics
+                if not np.isfinite([rmse, mae, r2, ndcg]).all():
+                    logger.warning("Invalid metrics detected, skipping batch")
+                    return None
+                
+                metrics = {
+                    'loss': float(rmse ** 2),  # Use RMSE² as loss
+                    'rmse': float(rmse),
+                    'mae': float(mae),
+                    'r2': float(r2),
+                    'ndcg': float(ndcg)
+                }
+                
+                return metrics
+                
+            except Exception as e:
+                logger.warning(f"Error in sklearn metrics calculation: {str(e)}")
+                return None
+                
+        except Exception as e:
+            logger.error(f"Fatal error in calculate_metrics: {str(e)}")
+            return None
+
     def train_epoch(self) -> Dict[str, float]:
-        """Train the model for one epoch."""
+        """Train the model for one epoch with improved metric handling."""
         self.model.train()
-        total_metrics = {'loss': 0.0, 'rmse': 0.0, 'mae': 0.0, 'ndcg': 0.0}
-        num_batches = len(self.train_loader)
+        total_metrics = {'loss': 0.0, 'rmse': 0.0, 'mae': 0.0, 'r2': 0.0, 'ndcg': 0.0}
+        valid_batches = 0
         
         for batch in tqdm(self.train_loader, desc='Training'):
             batch = {k: v.to(self.device) for k, v in batch.items()}
             
             self.optimizer.zero_grad()
             predictions = self.model(batch)
-            # Add L1 regularization to loss
+            
+            # Calculate loss and backpropagate
             loss = self.criterion(predictions, batch['playcount'])
             l1_loss = self.calculate_l1_loss(self.model)
             total_loss = loss + l1_loss
+
+            if 'sample_weight' in batch:
+                total_loss = total_loss * batch['sample_weight'].to(self.device)
+                total_loss = total_loss.mean()
+
             total_loss.backward()
-            
-            # Gradient clipping
             torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.max_grad_norm)
-            
             self.optimizer.step()
             
-            # Calculate metrics
+            # Calculate and accumulate metrics
             batch_metrics = self.calculate_metrics(predictions.detach(), batch['playcount'])
-            for k, v in batch_metrics.items():
-                total_metrics[k] += v
-                
+            if batch_metrics is not None:
+                for k, v in batch_metrics.items():
+                    total_metrics[k] += v
+                valid_batches += 1
+        
         # Average metrics
-        avg_metrics = {k: v / num_batches for k, v in total_metrics.items()}
+        if valid_batches > 0:
+            avg_metrics = {k: v / valid_batches for k, v in total_metrics.items()}
+        else:
+            logger.warning("No valid batches in epoch")
+            avg_metrics = {k: float('nan') for k in total_metrics.keys()}
+        
         return avg_metrics
         
     def validate(self) -> Dict[str, float]:
-        """Validate the model."""
+        """Validate the model with consistent metrics."""
         self.model.eval()
-        total_metrics = {'loss': 0.0, 'rmse': 0.0, 'mae': 0.0, 'ndcg': 0.0}
-        num_batches = len(self.val_loader)
+        total_metrics = {
+            'loss': 0.0, 'rmse': 0.0, 'mae': 0.0, 
+            'r2': 0.0, 'ndcg': 0.0  # Ensure all metrics are initialized
+        }
+        valid_batches = 0
         
         with torch.no_grad():
             for batch in tqdm(self.val_loader, desc='Validating'):
@@ -367,11 +461,18 @@ class Trainer:
                 
                 # Calculate metrics
                 batch_metrics = self.calculate_metrics(predictions, batch['playcount'])
-                for k, v in batch_metrics.items():
-                    total_metrics[k] += v
-                    
+                if batch_metrics is not None:
+                    for k, v in batch_metrics.items():
+                        total_metrics[k] += v
+                    valid_batches += 1
+        
         # Average metrics
-        avg_metrics = {k: v / num_batches for k, v in total_metrics.items()}
+        if valid_batches > 0:
+            avg_metrics = {k: v / valid_batches for k, v in total_metrics.items()}
+        else:
+            logger.warning("No valid batches in validation")
+            avg_metrics = {k: float('nan') for k in total_metrics.keys()}
+            
         return avg_metrics
         
     def save_checkpoint(self, epoch: int, metrics: Dict[str, float], is_best: bool = False):
@@ -423,6 +524,7 @@ class Trainer:
             self.metrics_history['train_ndcg'].append(float(train_metrics['ndcg']))
             self.metrics_history['val_loss'].append(float(val_metrics['loss']))
             self.metrics_history['val_rmse'].append(float(val_metrics['rmse']))
+            # Fix the mismatch: rename 'val_mae' and 'val_ndcg' to 'mae' and 'ndcg'
             self.metrics_history['val_mae'].append(float(val_metrics['mae']))
             self.metrics_history['val_ndcg'].append(float(val_metrics['ndcg']))
             self.metrics_history['lr'].append(current_lr)
@@ -465,7 +567,7 @@ def cross_validate(data: pd.DataFrame, config: Dict, n_splits: int = 5):
     # Initialize encoders once on full dataset
     encoder = DataEncoder()
     encoder.fit(data)
-    encoders = encoder.get_encoders()
+    encoders = encoder  # Use encoder directly
     
     for fold, (train_idx, val_idx) in enumerate(kf.split(data)):
         logger.info(f"Training fold {fold + 1}/{n_splits}")
@@ -481,12 +583,14 @@ def cross_validate(data: pd.DataFrame, config: Dict, n_splits: int = 5):
         train_loader = DataLoader(train_dataset, batch_size=config['batch_size'], shuffle=True)
         val_loader = DataLoader(val_dataset, batch_size=config['batch_size'])
         
-        # Initialize model with dimensions from the common encoder
+        # Get dimensions from encoder
+        dims = encoders.get_dims()
+        
+        # Initialize model with correct dimensions
         model = HybridMusicRecommender(
-            num_users=len(encoders['user_encoder'].classes_),
-            num_music=len(encoders['music_encoder'].classes_),
-            num_artists=len(encoders['artist_encoder'].classes_),
-            num_genres=len(encoders['genre_encoder'].classes_),
+            music_dims=train_dataset.music_features.shape[1],
+            artist_dims=train_dataset.artist_features.shape[1],
+            genre_dims=dims['genre_dims'],  # Use genre dimensions from encoder
             num_numerical=12,
             embedding_dim=config['embedding_dim'],
             layers=config['hidden_layers'],
@@ -526,26 +630,26 @@ def main():
     # Configuration
     config = {
         'learning_rate': 0.001,
-        'weight_decay': 1e-5,
-        'epochs': 20,
+        'weight_decay': 1e-4,
+        'epochs': 50,
         'batch_size': 32,
         'embedding_dim': 64,
         'model_dir': 'models',
-        'hidden_layers': [256, 128, 64],
-        'dropout': 0.3,
-        'early_stopping_patience': 2,
+        'hidden_layers': [512, 256, 128],
+        'dropout': 0.2,
+        'early_stopping_patience': 3,
         'max_grad_norm': 1.0,
         'l1_lambda': 1e-5,  # L1 regularization strength
         'n_splits': 5,      # Number of cross-validation folds
     }
-    
+    0
     # Save configuration
     os.makedirs('config', exist_ok=True)
     with open('config/model_config.json', 'w') as f:
         json.dump(config, f, indent=4)
     
     # Load data and encoders
-    train_data = pd.read_csv('../../data/train_data.csv')
+    train_data = pd.read_csv('data/processed_data/train_data.csv')
     
     # Don't load existing encoders for cross-validation
     # Instead, let cross_validate create new encoders on the full dataset

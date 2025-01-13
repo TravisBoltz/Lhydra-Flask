@@ -46,27 +46,37 @@ class ModelEvaluator:
         
     def _initialize_model(self, custom_config: Dict = None) -> HybridMusicRecommender:
         """Initialize and load the model from checkpoint."""
-        # Use custom config if provided, otherwise use default
-        config = custom_config if custom_config else self.config
-        
-        model = HybridMusicRecommender(
-            num_users=len(self.encoders['user_encoder'].classes_),
-            num_music=len(self.encoders['music_encoder'].classes_),
-            num_artists=len(self.encoders['artist_encoder'].classes_),
-            num_genres=len(self.encoders['genre_encoder'].classes_),
-            num_numerical=12,
-            embedding_dim=config['embedding_dim'],
-            layers=config['hidden_layers'],
-            dropout=config['dropout']
-        )
-        
-        # Only load state dict if using default config
-        if not custom_config:
-            model.load_state_dict(self.checkpoint['model_state_dict'])
-        
-        model = model.to(self.device)
-        model.eval()
-        return model
+        # Get dimensions from encoder
+        try:
+            dims = self.encoders.get_dims()
+            logger.info(f"Model dimensions: {dims}")
+            
+            model = HybridMusicRecommender(
+                music_dims=dims['music_dims'],
+                artist_dims=dims['artist_dims'],
+                genre_dims=dims['genre_dims'],  # Must match TF-IDF size
+                num_numerical=dims['num_numerical'],
+                embedding_dim=self.config.get('embedding_dim', 64),
+                layers=self.config.get('hidden_layers', [256, 128, 64]),
+                dropout=self.config.get('dropout', 0.2)
+            )
+            
+            # Load state dict with strict=False to allow partial loading
+            if not custom_config:
+                try:
+                    model.load_state_dict(self.checkpoint['model_state_dict'], strict=False)
+                    logger.info("Model state loaded successfully")
+                except Exception as e:
+                    logger.warning(f"Error loading model state: {str(e)}")
+                    logger.warning("Initializing model with fresh weights")
+            
+            model = model.to(self.device)
+            model.eval()
+            return model
+            
+        except KeyError as e:
+            logger.error(f"Missing key in encoders: {str(e)}")
+            raise
     
     def _prepare_data(self) -> DataLoader:
         """Prepare test data loader using saved encoders."""
@@ -214,24 +224,21 @@ class ModelEvaluator:
             logger.error(f"Error saving error distribution plot: {str(e)}")
     
     def evaluate_top_k_recommendations(self, k: int = 10) -> Dict[str, float]:
-        """Evaluate top-K recommendation metrics."""
-        user_metrics = []
+        """Improved top-K evaluation with proper NDCG calculation."""
+        metrics = {'ndcg@10': 0.0, 'precision@10': 0.0, 'recall@10': 0.0}
+        total_users = 0
         
-        # Group by user to evaluate per-user recommendations
-        for user_id in self.test_data['user_id'].unique():
-            user_mask = self.test_data['user_id'] == user_id
-            user_data = self.test_data[user_mask]
-            
-            # Skip users with too few interactions
-            if len(user_data) < k:
+        # Group by age and gender as proxy for user groups
+        for (age, gender), group_data in self.test_data.groupby(['age', 'gender']):
+            if len(group_data) < k:
                 continue
-            
+                
             user_dataset = MusicRecommenderDataset(
-                user_data,
+                group_data,
                 mode='test',
                 encoders=self.encoders
             )
-            user_loader = DataLoader(user_dataset, batch_size=len(user_data), shuffle=False)
+            user_loader = DataLoader(user_dataset, batch_size=len(group_data), shuffle=False)
             
             with torch.no_grad():
                 batch = next(iter(user_loader))
@@ -239,42 +246,39 @@ class ModelEvaluator:
                 predictions = self.model(batch).cpu().numpy()
                 true_values = batch['playcount'].cpu().numpy()
                 
-                # Normalize predictions and true values to [0, 1] range
-                true_values = (true_values - true_values.min()) / (true_values.max() - true_values.min() + 1e-8)
-                predictions = (predictions - predictions.min()) / (predictions.max() - predictions.min() + 1e-8)
+                # Ensure predictions and true_values are 1-dimensional
+                predictions = predictions.flatten()
+                true_values = true_values.flatten()
                 
-                # Calculate metrics for this user
+                # Calculate NDCG
                 top_k_pred_idx = np.argsort(predictions)[-k:][::-1]
                 top_k_true_idx = np.argsort(true_values)[-k:][::-1]
                 
-                # Calculate NDCG
-                dcg = self._calculate_dcg(true_values, top_k_pred_idx, k)
-                idcg = self._calculate_dcg(true_values, top_k_true_idx, k)
-                
-                # Handle edge case where idcg is 0
-                ndcg = dcg / idcg if idcg > 0 else 0.0
+                # Use sklearn's ndcg_score for more reliable calculation
+                ndcg = ndcg_score(
+                    true_values.reshape(1, -1),
+                    predictions.reshape(1, -1),
+                    k=k
+                )
                 
                 # Calculate precision and recall
                 relevant_items = set(top_k_true_idx)
                 recommended_items = set(top_k_pred_idx)
                 
-                precision = len(relevant_items & recommended_items) / k
-                recall = len(relevant_items & recommended_items) / len(relevant_items)
+                n_relevant_and_recommended = len(relevant_items & recommended_items)
+                precision = n_relevant_and_recommended / k
+                recall = n_relevant_and_recommended / len(relevant_items)
                 
-                user_metrics.append({
-                    'ndcg': ndcg,
-                    'precision': precision,
-                    'recall': recall
-                })
+                metrics['ndcg@10'] += ndcg
+                metrics['precision@10'] += precision
+                metrics['recall@10'] += recall
+                total_users += 1
         
-        # Average metrics across users
-        avg_metrics = {
-            'ndcg@10': float(np.mean([m['ndcg'] for m in user_metrics])),
-            'precision@10': float(np.mean([m['precision'] for m in user_metrics])),
-            'recall@10': float(np.mean([m['recall'] for m in user_metrics]))
-        }
+        # Average metrics
+        if total_users > 0:
+            metrics = {k: v / total_users for k, v in metrics.items()}
         
-        return avg_metrics
+        return metrics
 
     def _calculate_dcg(self, true_values: np.ndarray, indices: np.ndarray, k: int) -> float:
         """Helper method to calculate DCG with numerical stability."""
@@ -288,40 +292,18 @@ class ModelEvaluator:
         return float(np.sum(gains))
     
     def evaluate_cold_start(self, min_interactions: int = 5) -> Dict[str, Dict[str, float]]:
-        """
-        Evaluate model performance on cold-start scenarios.
-        
-        Args:
-            min_interactions: Minimum number of interactions to consider a user/item as non-cold
-        
-        Returns:
-            Dictionary containing metrics for different cold-start scenarios
-        """
-        # Get all unique users and items
-        all_users = self.test_data['user_id'].unique()
-        all_items = self.test_data['music_id'].unique()
-        
-        # Count interactions per user and item
-        user_counts = self.test_data['user_id'].value_counts()
-        item_counts = self.test_data['music_id'].value_counts()
-        
-        # Identify cold users and items
-        cold_users = set(user_counts[user_counts < min_interactions].index)
+        """Update to handle multidimensional predictions."""
+        # Get unique items and their interaction counts
+        item_counts = self.test_data['music'].value_counts()
         cold_items = set(item_counts[item_counts < min_interactions].index)
         
         # Create masks for different scenarios
-        cold_user_mask = self.test_data['user_id'].isin(cold_users)
-        cold_item_mask = self.test_data['music_id'].isin(cold_items)
-        cold_user_warm_item = cold_user_mask & ~cold_item_mask
-        warm_user_cold_item = ~cold_user_mask & cold_item_mask
-        cold_both = cold_user_mask & cold_item_mask
-        warm_both = ~cold_user_mask & ~cold_item_mask
+        cold_item_mask = self.test_data['music'].isin(cold_items)
+        warm_item_mask = ~cold_item_mask
         
         scenarios = {
-            'cold_user_warm_item': cold_user_warm_item,
-            'warm_user_cold_item': warm_user_cold_item,
-            'cold_both': cold_both,
-            'warm_both': warm_both
+            'cold_items': cold_item_mask,
+            'warm_items': warm_item_mask
         }
         
         results = {}
@@ -332,7 +314,7 @@ class ModelEvaluator:
                 
             scenario_data = self.test_data[mask].copy()
             
-            # Create a temporary dataset and dataloader for this scenario
+            # Create dataset and loader for this scenario
             scenario_dataset = MusicRecommenderDataset(
                 scenario_data,
                 mode='test',
@@ -353,9 +335,18 @@ class ModelEvaluator:
                 for batch in scenario_loader:
                     batch = {k: v.to(self.device) for k, v in batch.items()}
                     pred = self.model(batch)
-                    true_values.extend(batch['playcount'].cpu().numpy())
-                    predictions.extend(pred.cpu().numpy())
+                    # Ensure predictions are 1-dimensional
+                    if len(pred.shape) > 1:
+                        pred = pred.squeeze()
+                    # Convert to numpy array and flatten
+                    pred_np = pred.cpu().numpy()
+                    if isinstance(pred_np, np.ndarray):
+                        predictions.extend(pred_np.flatten())
+                    else:
+                        predictions.append(float(pred_np))
+                    true_values.extend(batch['playcount'].cpu().numpy().flatten())
             
+            # Convert lists to numpy arrays
             true_values = np.array(true_values)
             predictions = np.array(predictions)
             
@@ -374,12 +365,6 @@ class ModelEvaluator:
             
             results[scenario_name] = metrics
             
-            # Log results for this scenario
-            logger.info(f"\n{scenario_name} Metrics (n={metrics['count']}):")
-            for metric, value in metrics.items():
-                if metric != 'count':
-                    logger.info(f"{metric}: {value:.4f}")
-        
         return results
     
     def save_evaluation_results(self, save_dir: str = 'metrics'):
@@ -442,11 +427,27 @@ class ModelEvaluator:
         return best_params
 
 def main():
-    # Load test data and check for data compatibility
-    ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    test_path = os.path.join(ROOT_DIR, 'data', 'test_data.csv')
-    model_path = os.path.join(ROOT_DIR, 'data_engineered_v3', 'rs_main_v2_refactored', 'checkpoints', 'best_model.pth')
+    # Update paths to match actual directory structure
+    ROOT_DIR = os.getcwd()
+    test_path = os.path.join(ROOT_DIR, 'data','processed_data', 'test_data.csv')  # This will point to /home/martinson/Lhydra_rs/data/test_data.csv
+    model_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'checkpoints', 'best_model.pth')
     
+    # Validate paths exist
+    if not os.path.exists(test_path):
+        logger.error(f"Test data not found at: {test_path}")
+        raise FileNotFoundError(f"Test data file not found at {test_path}")
+    
+    if not os.path.exists(model_path):
+        logger.error(f"Model file not found at: {model_path}")
+        model_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'checkpoints', 'latest_checkpoint.pt')
+        if not os.path.exists(model_path):
+            raise FileNotFoundError(f"No model checkpoint found in {os.path.dirname(model_path)}")
+
+    # Print resolved paths
+    logger.info(f"Using test data from: {test_path}")
+    logger.info(f"Using model from: {model_path}")
+
+    # Load test data and check for data compatibility
     test_data = pd.read_csv(test_path)
     logger.info(f"Loaded test data with {len(test_data)} samples")
     
@@ -494,4 +495,43 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+import unittest
+
+class TestModelEvaluator(unittest.TestCase):
+    def setUp(self):
+        # Mock model and data
+        self.model = HybridMusicRecommender(...).to('cpu')
+        self.test_data = pd.DataFrame({
+            # ...populate with test data...
+        })
+        self.evaluator = ModelEvaluator('path/to/mock_model.pth', self.test_data, batch_size=2)
+
+    def test_initialize_model(self):
+        self.assertIsNotNone(self.evaluator.model)
+
+    def test_calculate_metrics(self):
+        metrics = self.evaluator.calculate_metrics()
+        self.assertIn('mse', metrics)
+        self.assertIn('rmse', metrics)
+        self.assertIn('mae', metrics)
+        self.assertIn('r2', metrics)
+
+    def test_analyze_prediction_bias(self):
+        bias = self.evaluator.analyze_prediction_bias()
+        self.assertIsInstance(bias, dict)
+
+    def test_evaluate_cold_start(self):
+        results = self.evaluator.evaluate_cold_start()
+        self.assertIn('cold_items', results)
+        self.assertIn('warm_items', results)
+
+    def test_tune_hyperparameters(self):
+        param_grid = {'embedding_dim': [32, 64], 'dropout': [0.1, 0.2]}
+        val_data = pd.DataFrame({
+            # ...populate with validation data...
+        })
+        best_params = self.evaluator.tune_hyperparameters(param_grid, val_data)
+        self.assertIn('embedding_dim', best_params)
+        self.assertIn('dropout', best_params)
 

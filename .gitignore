@@ -1,1 +1,4 @@
 .env
+metrics/
+models/
+__pycache__/
