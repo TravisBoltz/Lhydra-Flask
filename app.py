@@ -198,6 +198,10 @@ def create_app():
         # Initialize API
         app.config['API'] = MusicRecommenderAPI()
         
+        @app.route("/")
+        def home():
+          return "Welcome to the app!"
+
         # Register routes
         @app.route('/api/health')
         def health_check():
