@@ -449,7 +449,7 @@ class Trainer:
                 
             logger.info("-" * 50)
 
-def cross_validate(data: pd.DataFrame, config: Dict, n_splits: int = 5):
+def cross_validate(data: pd.DataFrame, config: Dict, n_splits: int = 10):
     """Perform k-fold cross-validation."""
     kf = KFold(n_splits=n_splits, shuffle=True, random_state=42)
     fold_metrics = []

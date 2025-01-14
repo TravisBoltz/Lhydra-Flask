@@ -2912,3 +2912,37 @@ Bias Analysis:
 2025-01-10 22:46:42,394 - INFO - [33mPress CTRL+C to quit[0m
 2025-01-10 22:46:55,099 - INFO - 172.24.144.1 - - [10/Jan/2025 22:46:55] "GET /api/health HTTP/1.1" 200 -
 2025-01-10 22:46:55,125 - INFO - 172.24.144.1 - - [10/Jan/2025 22:46:55] "GET /api/health HTTP/1.1" 200 -
+2025-01-14 19:43:54,018 - INFO - Loading model from /home/travisboltz/Flask App/checkpoints/best_model.pth
+2025-01-14 19:43:54,675 - INFO - Model loaded successfully
+2025-01-14 19:43:54,689 - INFO - Encoder class counts:
+2025-01-14 19:43:54,690 - INFO - user_encoder: 9717
+2025-01-14 19:43:54,690 - INFO - music_encoder: 9373
+2025-01-14 19:43:54,690 - INFO - artist_encoder: 5059
+2025-01-14 19:43:54,690 - INFO - genre_encoder: 12
+2025-01-14 19:43:54,690 - INFO - Model dimensions from state dict:
+2025-01-14 19:43:54,690 - INFO - num_users: 7773
+2025-01-14 19:43:54,690 - INFO - num_music: 9324
+2025-01-14 19:43:54,690 - INFO - num_artists: 4482
+2025-01-14 19:43:54,690 - INFO - num_genres: 12
+2025-01-14 19:43:54,690 - INFO - num_numerical: 12
+2025-01-14 19:43:54,752 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8000
+ * Running on http://172.24.146.253:8000
+2025-01-14 19:43:54,752 - INFO - [33mPress CTRL+C to quit[0m
+2025-01-14 19:43:54,753 - INFO -  * Restarting with stat
+2025-01-14 19:43:56,903 - INFO - Loading model from /home/travisboltz/Flask App/checkpoints/best_model.pth
+2025-01-14 19:43:57,101 - INFO - Model loaded successfully
+2025-01-14 19:43:57,108 - INFO - Encoder class counts:
+2025-01-14 19:43:57,108 - INFO - user_encoder: 9717
+2025-01-14 19:43:57,109 - INFO - music_encoder: 9373
+2025-01-14 19:43:57,109 - INFO - artist_encoder: 5059
+2025-01-14 19:43:57,109 - INFO - genre_encoder: 12
+2025-01-14 19:43:57,109 - INFO - Model dimensions from state dict:
+2025-01-14 19:43:57,109 - INFO - num_users: 7773
+2025-01-14 19:43:57,109 - INFO - num_music: 9324
+2025-01-14 19:43:57,109 - INFO - num_artists: 4482
+2025-01-14 19:43:57,109 - INFO - num_genres: 12
+2025-01-14 19:43:57,109 - INFO - num_numerical: 12
+2025-01-14 19:43:57,141 - WARNING -  * Debugger is active!
+2025-01-14 19:43:57,147 - INFO -  * Debugger PIN: 145-519-504
