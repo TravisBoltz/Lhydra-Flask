@@ -11,7 +11,7 @@ voyager==2.1.0
 transformers==4.47.1
 seaborn==0.13.2
 sentence-transformers==3.3.1
-matplotlib==3.10.0
+# matplotlib==3.10.0
 tokenizers==0.21.0
 gensim==4.3.3
 lime==0.2.0.1
