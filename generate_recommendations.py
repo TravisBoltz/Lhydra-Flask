@@ -117,7 +117,7 @@ class RecommendationGenerator:
         
         return model
     
-    def generate_recommendations(self, user_info: dict, n_recommendations: int = 10) -> pd.DataFrame:
+    def generate_recommendations(self, user_info: dict, n_recommendations: int = 5) -> pd.DataFrame:
         """
         Generate music recommendations for a specific user.
         
@@ -191,8 +191,8 @@ class RecommendationGenerator:
         
         # Sort by predicted plays and get top N recommendations
         recommendations = recommendations.sort_values('predicted_plays', ascending=False)
-        recommendations = recommendations.head(n_recommendations)
-        
+        recommendations = recommendations.tail(n_recommendations)
+   
         # Debug predictions
         print(f"\nPrediction Statistics:")
         min_pred = recommendations['predicted_plays'].min()
