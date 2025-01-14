@@ -16,6 +16,6 @@ tokenizers==0.21.0
 gensim==4.3.3
 lime==0.2.0.1
 huggingface-hub==0.27.0
-
+shap
 # Python version requirement
 # Ensure the Python version is 3.11 or higher
