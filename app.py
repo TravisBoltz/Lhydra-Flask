@@ -7,7 +7,7 @@ import pandas as pd
 import logging
 from functools import wraps
 from typing import Dict, Any, List
-
+import torch
 
 # Add parent directory to system path
 current_dir = Path(__file__).resolve().parent
@@ -85,7 +85,8 @@ def find_file(paths: List[Path], file_type: str) -> Path:
         logger.error(f"  - {path}")
     raise FileNotFoundError(f"{file_type} not found")
 
-
+# class MusicRecommenderAPI:
+#     def __init__(self):
 # Setup paths
 paths = setup_paths()
 logger.info(f"Initialized paths: {paths}")
@@ -121,15 +122,35 @@ try:
         logger.warning("Adding explicit column")
         catalog_data["explicit"] = False
 
-    # Initialize recommendation generator
+    # Initialize encoder first
+    try:
+        encoder = DataEncoder()
+        # Try loading saved encoder
+        loaded_encoder = torch.load(encoder_path)
+        if hasattr(loaded_encoder, 'encoder') and loaded_encoder['encoder'].fitted:
+            encoder = loaded_encoder['encoder']
+            logger.info("Successfully loaded fitted encoder")
+        else:
+            # Fallback to fitting new encoder
+            logger.warning("Saved encoder not fitted, fitting new encoder on catalog data")
+            encoder.fit(catalog_data)
+            # Save newly fitted encoder
+            torch.save({'encoder': encoder}, encoder_path)
+    except Exception as e:
+        logger.error(f"Error loading encoder: {str(e)}")
+        logger.warning("Fitting new encoder on catalog data")
+        encoder.fit(catalog_data)
+        torch.save({'encoder': encoder}, encoder_path)
+
+    # Initialize recommendation generator with verified encoder
     recommender = RecommendationGenerator(
         model_path=str(model_path),
         catalog_data=catalog_data,
         encoders_path=str(encoder_path),
     )
-    logger.info("Model loaded successfully")
+
 except Exception as e:
-    logger.error(f"Error loading model: {str(e)}")
+    logger.error(f"Error during initialization: {str(e)}")
     raise
 
 

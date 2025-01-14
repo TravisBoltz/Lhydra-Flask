@@ -669,3 +669,14 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# ...existing code...
+
+    # def main():
+        # ...existing code...
+        # encoder = DataEncoder(max_features=5000)
+        # encoder.fit(train_data)
+        # torch.save({'encoder': encoder}, encoder_path)
+        # ...existing code...
+
+# ...existing code...

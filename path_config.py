@@ -1,6 +1,7 @@
 from pathlib import Path
+from typing import Dict
 
-def setup_paths():
+def setup_paths() -> Dict[str, Path]:
     """Set up all project paths."""
     # Get root directory (Lhydra_rs)
     root_dir = Path(__file__).resolve().parent

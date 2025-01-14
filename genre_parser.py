@@ -62,4 +62,5 @@ class GenreParser:
             logger.debug(f"Capitalized subgenres for main genre '{main_genre}': {main_genres[main_genre]}")
         
         logger.info(f"Main genres dictionary created with {len(main_genres)} categories.")
+        # Ensure all genres are accounted for before encoder fitting
         return main_genres
