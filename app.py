@@ -7,6 +7,7 @@ import pandas as pd
 import logging
 from functools import wraps
 from typing import Dict, Any, List
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 # Configure logging
 logging.basicConfig(level=logging.INFO,
@@ -95,6 +96,11 @@ encoder_paths = [
     paths['processed_data'] / 'encoder.pt'
 ]
 
+vectorizer_paths = [
+    paths['processed_data'] / 'tfidf_vectorizer.pkl',
+    paths['models'] / 'tfidf_vectorizer.pkl'
+]
+
 # Initialize model and data
 try:
     # Find valid paths for each resource
@@ -114,16 +120,38 @@ try:
     if 'explicit' not in catalog_data.columns:
         logger.warning("Adding explicit column")
         catalog_data['explicit'] = False
+
+    # Initialize TF-IDF vectorizer
+    try:
+        # Try to load existing vectorizer
+        import pickle
+        vectorizer_path = find_file(vectorizer_paths, "vectorizer file")
+        with open(vectorizer_path, 'rb') as f:
+            vectorizer = pickle.load(f)
+        logger.info("Loaded existing TF-IDF vectorizer")
+    except FileNotFoundError:
+        # Create and fit new vectorizer
+        logger.info("Creating new TF-IDF vectorizer")
+        vectorizer = TfidfVectorizer(stop_words='english')
+        # Combine relevant text columns for vectorization
+        text_data = catalog_data['genre'].fillna('') + ' ' + catalog_data['music'].fillna('')
+        vectorizer.fit(text_data)
+        # Save vectorizer for future use
+        os.makedirs(paths['processed_data'], exist_ok=True)
+        with open(paths['processed_data'] / 'tfidf_vectorizer.pkl', 'wb') as f:
+            pickle.dump(vectorizer, f)
+        logger.info("Saved new TF-IDF vectorizer")
     
-    # Initialize recommendation generator
+    # Initialize recommendation generator with vectorizer
     recommender = RecommendationGenerator(
         model_path=str(model_path),
         catalog_data=catalog_data,
-        encoders_path=str(encoder_path)
+        encoders_path=str(encoder_path),
+        vectorizer=vectorizer  # Pass the vectorizer to the recommendation generator
     )
-    logger.info("Model loaded successfully")
+    logger.info("Model and vectorizer loaded successfully")
 except Exception as e:
-    logger.error(f"Error loading model: {str(e)}")
+    logger.error(f"Error during initialization: {str(e)}")
     raise
 
 @app.route('/routes', methods=['GET'])
@@ -198,6 +226,7 @@ def health_check():
             'model_loaded': True,
             'catalog_size': len(catalog_data),
             'encoders_loaded': hasattr(recommender, 'encoders'),
+            'vectorizer_loaded': hasattr(recommender, 'vectorizer'),
             'api_version': '1.0.0',
             'supported_genres': list(recommender.encoders.known_genres) if hasattr(recommender, 'encoders') else []
         })
