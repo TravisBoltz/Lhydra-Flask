@@ -44,18 +44,6 @@ class ModelEvaluator:
         self.metrics_dir = os.path.join(os.path.dirname(model_path), 'metrics')
         os.makedirs(self.metrics_dir, exist_ok=True)
         
-        try:
-            loaded = torch.load(model_path, map_location=self.device)
-            self.model = self._initialize_model(loaded['config'])
-            self.encoders = loaded['encoders']['encoder']
-            if not self.encoders.fitted:
-                logger.warning("Encoders not fitted. Fitting encoders.")
-                self.encoders.fit(test_data)
-                torch.save({'config': self.config, 'encoders': {'encoder': self.encoders}}, model_path)
-        except Exception as e:
-            logger.error(f"Failed to load model or encoders: {e}")
-            raise
-        
     def _initialize_model(self, custom_config: Dict = None) -> HybridMusicRecommender:
         """Initialize and load the model from checkpoint."""
         # Get dimensions from encoder
