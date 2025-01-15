@@ -2,7 +2,6 @@ import os
 import sys
 from pathlib import Path
 import logging
-import numpy as np
 import pandas as pd
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -200,7 +199,7 @@ def create_app():
         
         @app.route("/")
         def home():
-            return "Welcome to the Music Recommendation App!"
+          return "Welcome to the app!"
 
         # Register routes
         @app.route('/api/health')
@@ -242,10 +241,11 @@ def create_app():
         logger.error(f"Failed to create application: {str(e)}", exc_info=True)
         raise
 
-app = create_app()
-
 if __name__ == '__main__':
     try:
+        # Create and configure app
+        app = create_app()
+        
         # Print startup information
         logger.info(f"Current working directory: {os.getcwd()}")
         logger.info(f"Python path: {sys.path}")
@@ -253,9 +253,10 @@ if __name__ == '__main__':
         
         # Run the app
         app.run(
-            host='0.0.0.0',  # Changed from 127.0.0.1 to allow external connections
-            port=int(os.environ.get('PORT', 5000)),
-            debug=False  # Disable debug in production
+            host='127.0.0.1',
+            port=5000,
+            debug=True,
+            use_reloader=False  # Disable reloader to prevent duplicate model loading
         )
         
     except Exception as e:
