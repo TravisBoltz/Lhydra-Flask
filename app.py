@@ -199,9 +199,8 @@ def create_app():
         
         @app.route("/")
         def home():
-          return "Welcome to the app!"
+            return "Welcome to the Music Recommender API!"
 
-        # Register routes
         @app.route('/api/health')
         def health_check():
             """Health check endpoint."""
@@ -243,15 +242,15 @@ def create_app():
 
 if __name__ == '__main__':
     try:
-        # Create and configure app
+        # Create and configure app for development
         app = create_app()
         
         # Print startup information
         logger.info(f"Current working directory: {os.getcwd()}")
         logger.info(f"Python path: {sys.path}")
-        logger.info("Starting Flask application...")
+        logger.info("Starting Flask development server...")
         
-        # Run the app
+        # Run the development server
         app.run(
             host='127.0.0.1',
             port=5000,
@@ -262,3 +261,6 @@ if __name__ == '__main__':
     except Exception as e:
         logger.error(f"Failed to start application: {str(e)}", exc_info=True)
         raise
+
+# Create the application instance for Gunicorn
+app = create_app()
